@@ -1,0 +1,19 @@
+# Bağımlılıklar
+node_modules/
+f/node_modules/
+b/node_modules/
+
+# Build
+f/dist/
+
+# Ortam
+.env
+.env.local
+.env.*.local
+
+# IDE / OS
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
