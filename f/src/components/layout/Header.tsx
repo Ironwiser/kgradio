@@ -4,6 +4,7 @@ import { Radio, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navLinks = [
+  { to: "/canli", label: "Canlı Yayın" },
   { to: "/calma-listeleri", label: "Çalma Listeleri" },
   { to: "/rasgele", label: "Hakkımızda" },
 ]
@@ -58,7 +59,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           {/* Desktop CTA */}
           <Link
-            to="/calma-listeleri"
+            to="/canli"
             className="hidden md:inline-flex font-brutal-heading items-center px-6 py-2 sm:px-7 sm:py-2.5 text-2xl tracking-wide text-black bg-white hover:bg-neutral-200 transition-colors"
           >
             Dinle
@@ -108,7 +109,7 @@ export function Header() {
             </Link>
           ))}
           <Link
-            to="/calma-listeleri"
+            to="/canli"
             onClick={closeMobile}
             className="font-brutal-heading mt-3 inline-flex items-center justify-center py-4 px-5 text-2xl tracking-wide text-black bg-white hover:bg-neutral-200 transition-colors touch-manipulation"
           >
