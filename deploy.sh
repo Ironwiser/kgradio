@@ -1,5 +1,5 @@
 #!/bin/bash
-# KG Radio – npm kurulumu + nginx ayarı
+# LfoRadio – npm kurulumu + nginx ayarı
 # Proje kökünden: ./deploy.sh  veya  bash deploy.sh
 
 set -e
