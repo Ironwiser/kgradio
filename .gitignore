@@ -17,3 +17,6 @@ f/dist/
 *.log
 .DS_Store
 Thumbs.db
+
+# Müzik dosyaları (repoya dahil etme)
+music/
