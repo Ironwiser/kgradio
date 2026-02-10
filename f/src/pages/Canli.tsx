@@ -1,8 +1,9 @@
 import { Player } from "@/components/player/Player"
 
-// AzuraCast canlı yayın URL'i (LfoRadio istasyonu)
+// AzuraCast canlı yayın URL'i (Lfo Radio istasyonu)
+// Not: Slug ekran görüntüsüne göre "lfo_radio"
 const LIVE_STREAM_URL =
-  "https://radio.lforadio.omurgenc.dev/listen/lfo-radio/radio.mp3"
+  "https://radio.lforadio.omurgenc.dev/listen/lfo_radio/radio.mp3"
 
 export function Canli() {
   return (

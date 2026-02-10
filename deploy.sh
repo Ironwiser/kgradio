@@ -1,10 +1,15 @@
-#!/bin/bash
+git #!/bin/bash
 # LfoRadio – npm kurulumu + nginx ayarı
 # Proje kökünden: ./deploy.sh  veya  bash deploy.sh
 
 set -e
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
+
+echo "→ Git'ten son değişiklikler çekiliyor (git pull)"
+if [ -d ".git" ]; then
+  git pull || echo "  UYARI: git pull başarısız oldu, local değişiklikler olabilir."
+fi
 
 echo "→ f: eski node_modules siliniyor, npm install + build"
 (cd "$ROOT_DIR/f" && rm -rf node_modules dist && npm install && npm run build)
