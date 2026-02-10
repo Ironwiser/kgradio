@@ -7,13 +7,30 @@ const heroConfig = {
   ctaSecondary: { label: "Hakkımızda", href: "/rasgele" },
 }
 
+const bgVideoSrc = "/animasyon/" + encodeURIComponent("WhatsApp Video 2026-02-07 at 03.07.32.mp4")
+
 export function Hero() {
   return (
     <section
-      className="relative z-0 flex items-center border-b border-x border-border bg-[#111111] min-h-[calc(100vh-6rem)]"
+      className="relative z-0 flex items-center border-b border-x border-border min-h-[calc(100vh-6rem)] overflow-hidden"
       aria-label="Ana içerik"
     >
-      <div className="w-full px-4 sm:px-6 -translate-y-4 sm:-translate-y-10">
+      {/* Arka plan videosu */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="h-full w-full object-cover"
+          aria-hidden
+        >
+          <source src={bgVideoSrc} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/50" aria-hidden />
+      </div>
+
+      <div className="relative z-10 w-full px-4 sm:px-6 -translate-y-4 sm:-translate-y-10">
         {/* Ortadaki blok – sade logo + slogan */}
         <div className="mx-auto w-full max-w-3xl text-center">
           <h1 className="font-logo text-5xl sm:text-6xl lg:text-7xl tracking-tight text-white">
