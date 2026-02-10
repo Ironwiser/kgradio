@@ -1,0 +1,2 @@
+# Shell script'ler sunucuda LF ile çalışsın (CRLF hatasını önler)
+*.sh text eol=lf

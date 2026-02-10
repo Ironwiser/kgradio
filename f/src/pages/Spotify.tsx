@@ -37,33 +37,33 @@ export function Spotify() {
   return (
     <section
       className={cn(
-        "relative min-h-[calc(100vh-4rem)] px-4 py-12",
-        "bg-gradient-to-r from-blue-600 via-blue-500/90 to-cyan-500"
+        "relative min-h-[calc(100vh-4rem)] px-4 py-6 sm:py-12",
+        "bg-[#111111]"
       )}
     >
-      <div className="container relative z-10 mx-auto max-w-2xl">
-        <h1 className="mb-6 text-2xl font-bold text-white drop-shadow-sm">
-          Çalma Listeleri
+      <div className="container relative z-10 mx-auto max-w-3xl min-w-0">
+        <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
+          LfoRadio · Çalma Listeleri
         </h1>
         <Player
           src={playerSrc}
-          title="KG Radio"
+          title="LfoRadio"
           trackName={playerTrackName}
           artworkUrl={playerArtworkUrl}
           trackInfoUrl={selectedTrack ? undefined : "/api/audio/current"}
           autoPlay={!!selectedTrack}
-          className="border-white/20 bg-slate-900/90 shadow-xl backdrop-blur"
+          className="border-border bg-[#111111]"
         />
 
-        <div className="mt-8 rounded-2xl border border-white/20 bg-slate-900/90 p-4 shadow-xl backdrop-blur sm:p-5">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-white/80">
-            <Music className="h-4 w-4" />
+        <div className="mt-10 rounded-lg border border-border bg-[#111111] p-5 sm:p-6">
+          <h2 className="mb-4 flex items-center gap-3 text-xl font-medium tracking-wider text-white/80">
+            <Music className="h-5 w-5" />
             Çalma Listeleri
           </h2>
           {listLoading ? (
-            <p className="py-4 text-sm text-white/60">Yükleniyor…</p>
+            <p className="py-4 text-base text-white/60">Yükleniyor…</p>
           ) : trackList.length === 0 ? (
-            <p className="py-4 text-sm text-white/60">Henüz parça yok.</p>
+            <p className="py-4 text-base text-white/60">Henüz parça yok.</p>
           ) : (
             <ul className="space-y-1">
               {trackList.map((track) => (
@@ -72,10 +72,10 @@ export function Spotify() {
                     type="button"
                     onClick={() => setSelectedTrack(track)}
                     className={cn(
-                      "w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors",
+                      "w-full px-3 py-2 text-left text-base font-medium min-h-[40px] flex items-center touch-manipulation",
                       selectedTrack?.url === track.url
-                        ? "bg-primary/20 text-white"
-                        : "text-white/90 hover:bg-white/10 hover:text-white"
+                        ? "bg-white text-black"
+                        : "bg-[#777777] text-black hover:bg-[#999999]"
                     )}
                   >
                     {track.displayName}

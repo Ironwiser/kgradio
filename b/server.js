@@ -3,14 +3,14 @@ import cors from "cors"
 import path from "path"
 import fs from "fs"
 import { fileURLToPath } from "url"
-import { parseFile, selectCover } from "music-metadata"
+import { parseFile } from "music-metadata"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const KEREM_ROOT = path.join(__dirname, "..")
 const MUSIC_DIR = path.join(__dirname, "music")
 
 const app = express()
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT || 3010
 
 app.use(cors())
 
@@ -102,7 +102,7 @@ app.get("/api/audio/artwork/:filename", async (req, res) => {
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Dosya bulunamadı." })
   try {
     const metadata = await parseFile(filePath)
-    const picture = selectCover(metadata.common.picture) ?? metadata.common.picture?.[0]
+    const picture = metadata.common.picture?.[0]
     if (!picture?.data) return res.status(404).json({ error: "Bu parçada kapak görseli yok." })
     res.setHeader("Content-Type", picture.format || "image/jpeg")
     res.send(Buffer.from(picture.data))
@@ -126,7 +126,7 @@ app.get("/api/audio/file/:filename", (req, res) => {
 const FRONTEND_DIST = path.join(__dirname, "..", "f", "dist")
 if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST))
-  app.get("*", (req, res) => {
+  app.get(/.*/, (req, res) => {
     res.sendFile(path.join(FRONTEND_DIST, "index.html"))
   })
 }

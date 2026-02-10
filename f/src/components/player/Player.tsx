@@ -38,7 +38,6 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   const [volumeOpen, setVolumeOpen] = React.useState(false)
   const volumeRef = React.useRef<HTMLDivElement>(null)
   const isSeekingRef = React.useRef(false)
-
   /** Dışarı tıklanınca volume panelini kapat (mobil) */
   React.useEffect(() => {
     if (!volumeOpen) return
@@ -51,6 +50,13 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     return () => document.removeEventListener("pointerdown", handleClickOutside)
   }, [volumeOpen])
 
+  const handleVolumeButtonPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "touch") {
+      setVolumeOpen((o) => !o)
+      e.preventDefault()
+    }
+  }
+
   const togglePlay = React.useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -60,7 +66,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     } else {
       setError(null)
       setIsLoading(true)
-      audio.play().catch((e) => {
+      audio.play().catch(() => {
         setError("Çalınamadı. Stream URL'sini kontrol edin.")
         setIsPlaying(false)
       }).finally(() => setIsLoading(false))
@@ -173,12 +179,6 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     setIsMuted(v === 0)
   }
 
-  const toggleMute = () => {
-    setIsMuted((m) => !m)
-    const audio = audioRef.current
-    if (audio) audio.volume = isMuted ? volume : 0
-  }
-
   const hasSource = src && src.length > 0
   const canPlay = hasSource
 
@@ -219,7 +219,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   return (
     <div
       className={cn(
-        "flex overflow-hidden rounded-2xl border border-border/40 bg-card/90 shadow-xl shadow-black/5 backdrop-blur",
+        "flex overflow-hidden rounded-lg border border-border/40 bg-card",
         className
       )}
     >
@@ -229,9 +229,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         <div
           className={cn(
             "flex h-36 w-36 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-40 sm:w-40",
-            resolvedArtworkUrl && !artworkLoadFailed
-              ? "bg-muted"
-              : "relative bg-gradient-to-br from-slate-600/90 via-slate-700/80 to-primary/40 shadow-inner"
+            resolvedArtworkUrl && !artworkLoadFailed ? "bg-muted" : "bg-[#111111]"
           )}
         >
           {resolvedArtworkUrl && !artworkLoadFailed ? (
@@ -260,13 +258,13 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       {/* Sağ: başlık, progress, kontroller */}
       <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5">
         {title && (
-          <h3 className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <h3 className="mb-2 text-base font-medium capitalize tracking-wider text-muted-foreground">
             {title}
           </h3>
         )}
         {trackName && (
           <p
-            className="mb-3 truncate text-base font-semibold text-foreground sm:text-lg"
+            className="mb-4 truncate text-2xl font-semibold text-foreground"
             title={trackName}
           >
             {trackName}
@@ -287,7 +285,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4")}
               aria-label="Şarkı ilerlemesi"
             />
-            <div className="mt-1.5 flex justify-between text-xs text-muted-foreground">
+            <div className="mt-2 flex justify-between text-sm text-muted-foreground">
               <span>{formatTime(currentTime)}</span>
               <span>
                 {Number.isFinite(duration) && duration > 0
@@ -297,65 +295,74 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             </div>
           </div>
         )}
-        <div className="flex items-center gap-4">
-          <Button
-          type="button"
-          size="icon"
-          className="h-12 w-12 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
-          onClick={togglePlay}
-          disabled={!canPlay || isLoading}
-          aria-label={isPlaying ? "Duraklat" : "Oynat"}
-        >
-          {isLoading ? (
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-          ) : isPlaying ? (
-            <Pause className="h-5 w-5" />
-          ) : (
-            <Play className="h-5 w-5 ml-0.5" />
-          )}
-        </Button>
-        <div
-          ref={volumeRef}
-          className="flex items-center gap-2"
-          onMouseEnter={() => setVolumeOpen(true)}
-          onMouseLeave={() => setVolumeOpen(false)}
-        >
+        <div className="flex flex-wrap items-center gap-5">
           <Button
             type="button"
-            variant="ghost"
             size="icon"
-            className="h-9 w-9 shrink-0 rounded-full"
-            onClick={() => setVolumeOpen((o) => !o)}
-            aria-label={isMuted ? "Sesi aç" : "Sesi kapat"}
-            aria-expanded={volumeVisible}
+            className="h-14 w-14 shrink-0 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
+            onClick={togglePlay}
+            disabled={!canPlay || isLoading}
+            aria-label={isPlaying ? "Duraklat" : "Oynat"}
           >
-            {isMuted || volume === 0 ? (
-              <VolumeX className="h-5 w-5" />
+            {isLoading ? (
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+            ) : isPlaying ? (
+              <Pause className="h-5 w-5" />
             ) : (
-              <Volume2 className="h-5 w-5" />
+              <Play className="h-5 w-5 ml-0.5" />
             )}
           </Button>
           <div
-            className={cn(
-              "flex h-9 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-popover px-4 shadow-xl transition-all duration-200",
-              volumeVisible
-                ? "w-40 min-w-[10rem] opacity-100"
-                : "w-0 min-w-0 border-0 bg-transparent px-0 opacity-0 pointer-events-none"
-            )}
+            ref={volumeRef}
+            className="flex flex-wrap items-center gap-2 min-w-0 flex-1"
+            onMouseEnter={() => {
+              if (!window.matchMedia("(pointer: coarse)").matches) setVolumeOpen(true)
+            }}
+            onMouseLeave={() => {
+              if (!window.matchMedia("(pointer: coarse)").matches) setVolumeOpen(false)
+            }}
           >
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
-              onClick={(e) => e.stopPropagation()}
-              className={cn("w-full min-w-0", sliderTrackClass)}
-              aria-label="Ses düzeyi"
-            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0 rounded-full touch-manipulation"
+              onPointerDown={handleVolumeButtonPointerDown}
+              onClick={() => {
+                if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return
+                setVolumeOpen((o) => !o)
+              }}
+              aria-label={isMuted ? "Sesi aç" : "Sesi kapat"}
+              aria-expanded={volumeVisible}
+            >
+              {isMuted || volume === 0 ? (
+                <VolumeX className="h-5 w-5" />
+              ) : (
+                <Volume2 className="h-5 w-5" />
+              )}
+            </Button>
+            {/* Mobilde ses kaydırıcısı tam genişlikte alt satıra iner; masaüstünde satır içi */}
+            <div
+              className={cn(
+                "flex h-9 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-popover px-3 shadow-xl transition-all duration-200",
+                volumeVisible
+                  ? "w-full min-w-0 basis-full opacity-100 sm:basis-auto sm:w-40 sm:min-w-[10rem] sm:px-4"
+                  : "w-0 min-w-0 basis-0 border-0 bg-transparent px-0 opacity-0 pointer-events-none"
+              )}
+            >
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={isMuted ? 0 : volume}
+                onChange={handleVolumeChange}
+                onClick={(e) => e.stopPropagation()}
+                className={cn("w-full min-w-0 max-w-full", sliderTrackClass)}
+                aria-label="Ses düzeyi"
+              />
+            </div>
           </div>
-        </div>
         </div>
         {error && (
           <p className="mt-3 text-sm text-destructive" role="alert">
