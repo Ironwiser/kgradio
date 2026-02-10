@@ -48,7 +48,8 @@ else
   echo "  Var olan AzuraCast güncelleniyor..."
   cd "$AZ_DIR"
   ./docker.sh update-self || true
-  ./docker.sh update || true
+  # Güncelleme sırasında etkileşimli soruları otomatik "yes" ile geç
+  yes "" | ./docker.sh update || true
 fi
 
 cd "$ROOT_DIR"
@@ -70,6 +71,8 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
         proxy_buffering off;
     }
 }
@@ -86,6 +89,8 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
         proxy_buffering off;
     }
 }
