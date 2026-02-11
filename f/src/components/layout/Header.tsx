@@ -19,24 +19,24 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-[#111111]">
-      <div className="flex h-14 sm:h-16 items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 border-x-0 sm:border-x-[3px] border-border">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-[#111111] overflow-hidden">
+      <div className="flex h-[52px] items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 border-x-0 sm:border-x-[4px] border-border overflow-hidden">
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2 pr-2 sm:border-r-[3px] sm:border-border sm:pr-4 h-full items-center min-w-0"
+          className="flex items-center gap-2 pr-2 sm:border-r-[4px] sm:border-border sm:pr-4 h-full items-center min-w-0 shrink-0"
           onClick={closeMobile}
         >
-          <span className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center border border-border bg-[#d9d9d9]">
-            <Radio className="h-4 w-4 sm:h-5 sm:w-5 text-black" aria-hidden />
+          <span className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center bg-[#d9d9d9]">
+            <Radio className="h-3 w-3 sm:h-4 sm:w-4 text-black" aria-hidden />
           </span>
-          <span className="font-logo text-2xl sm:text-3xl tracking-tight text-white truncate">
+          <span className="font-logo text-xl sm:text-2xl text-white truncate">
             LfoRadio
           </span>
         </Link>
 
         {/* Desktop: Nav + CTA */}
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-4 lg:gap-6 border-r-[3px] border-border pr-6 lg:pr-8">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-4 lg:gap-6 border-r-[4px] border-border pr-6 lg:pr-8 min-w-0">
           {navLinks.map(({ to, label }) => {
             const isActive = location.pathname.startsWith(to)
             return (
@@ -44,13 +44,11 @@ export function Header() {
                 key={to}
                 to={to}
                 className={cn(
-                  "font-brutal-heading text-2xl tracking-wide px-6 py-2 min-h-[52px] flex items-center justify-center transition-colors",
-                  isActive
-                    ? "bg-white text-black"
-                    : "bg-[#777777] text-black hover:bg-white"
+                  "nav-link-glitch font-brutal-heading text-xl px-4 py-[10px] flex items-center justify-center transition-colors",
+                  isActive ? "text-white" : "text-white/70 hover:text-white"
                 )}
               >
-                {label}
+                <span>{label}</span>
               </Link>
             )
           })}
@@ -60,15 +58,15 @@ export function Header() {
           {/* Desktop CTA */}
           <Link
             to="/canli"
-            className="hidden md:inline-flex font-brutal-heading items-center px-6 py-2 sm:px-7 sm:py-2.5 text-2xl tracking-wide text-black bg-white hover:bg-neutral-200 transition-colors"
+            className="nav-link-glitch hidden md:inline-flex font-brutal-heading items-center px-5 py-[10px] text-xl text-white hover:text-white/80 transition-colors"
           >
-            Dinle
+            <span>Dinle</span>
           </Link>
 
           <button
             type="button"
             onClick={openDjPanel}
-            className="hidden md:inline-flex font-brutal-heading items-center px-4 py-2 sm:px-5 sm:py-2.5 text-xl tracking-wide text-black bg-[#facc15] hover:bg-[#fde047] transition-colors"
+            className="hidden md:inline-flex font-brutal-heading items-center px-4 py-[10px] text-base text-[#facc15] hover:text-[#fde047] transition-colors"
           >
             DJ Girişi
           </button>
@@ -77,7 +75,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-white text-white md:hidden touch-manipulation"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-white md:hidden touch-manipulation"
             aria-expanded={mobileOpen}
             aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
           >
@@ -90,7 +88,7 @@ export function Header() {
       <div
         className={cn(
           "md:hidden overflow-hidden border-t-2 border-border bg-[#111111] transition-[max-height] duration-200 ease-out",
-          mobileOpen ? "max-h-[280px]" : "max-h-0"
+          mobileOpen ? "max-h-[240px]" : "max-h-0"
         )}
         aria-hidden={!mobileOpen}
       >
@@ -101,19 +99,19 @@ export function Header() {
               to={to}
               onClick={closeMobile}
               className={cn(
-                "font-brutal-heading py-4 px-3 text-2xl capitalize tracking-wide border-b border-white/20 last:border-0 transition-colors touch-manipulation",
-                location.pathname === to ? "text-[#2563eb]" : "text-white hover:text-[#2563eb] hover:bg-white/5 active:bg-white/10"
+                "nav-link-glitch font-brutal-heading py-[10px] px-3 text-xl capitalize transition-colors touch-manipulation",
+                location.pathname === to ? "text-white" : "text-white/70 hover:text-white"
               )}
             >
-              {label}
+              <span>{label}</span>
             </Link>
           ))}
           <Link
             to="/canli"
             onClick={closeMobile}
-            className="font-brutal-heading mt-3 inline-flex items-center justify-center py-4 px-5 text-2xl tracking-wide text-black bg-white hover:bg-neutral-200 transition-colors touch-manipulation"
+            className="nav-link-glitch font-brutal-heading mt-2 inline-flex items-center justify-center py-[10px] px-4 text-xl text-white hover:text-white/80 transition-colors touch-manipulation"
           >
-            Dinle
+            <span>Dinle</span>
           </Link>
           <button
             type="button"
@@ -121,7 +119,7 @@ export function Header() {
               closeMobile()
               openDjPanel()
             }}
-            className="font-brutal-heading mt-2 inline-flex items-center justify-center py-4 px-5 text-2xl tracking-wide text-black bg-[#facc15] hover:bg-[#fde047] transition-colors touch-manipulation"
+            className="font-brutal-heading mt-2 inline-flex items-center justify-center py-[10px] px-4 text-xl text-[#facc15] hover:text-[#fde047] transition-colors touch-manipulation"
           >
             DJ Girişi
           </button>

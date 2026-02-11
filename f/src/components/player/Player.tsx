@@ -258,7 +258,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       {/* Sağ: başlık, progress, kontroller */}
       <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5">
         {title && (
-          <h3 className="mb-2 text-base font-medium capitalize tracking-wider text-muted-foreground">
+          <h3 className="mb-2 text-base font-medium capitalize text-muted-foreground">
             {title}
           </h3>
         )}

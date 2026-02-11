@@ -56,7 +56,7 @@ export function Spotify() {
         />
 
         <div className="mt-10 rounded-lg border border-border bg-[#111111] p-5 sm:p-6">
-          <h2 className="mb-4 flex items-center gap-3 text-xl font-medium tracking-wider text-white/80">
+          <h2 className="mb-4 flex items-center gap-3 text-xl font-medium text-white/80">
             <Music className="h-5 w-5" />
             Çalma Listeleri
           </h2>
