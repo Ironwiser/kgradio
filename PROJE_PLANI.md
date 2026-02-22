@@ -9,7 +9,7 @@ Radio.co benzeri modern bir online radyo sitesi geliştirilecek. Proje, pratik p
 ## 🎯 Proje Yapısı
 
 ```
-kerem/
+lforadio/
 ├── f/                          # Frontend klasörü
 │   ├── src/
 │   │   ├── components/

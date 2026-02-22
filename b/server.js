@@ -6,7 +6,7 @@ import { fileURLToPath } from "url"
 import { parseFile } from "music-metadata"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const KEREM_ROOT = path.join(__dirname, "..")
+const LFORADIO_ROOT = path.join(__dirname, "..")
 const MUSIC_DIR = path.join(__dirname, "music")
 
 const app = express()
@@ -24,11 +24,11 @@ function getMp3List(dir) {
     .sort((a, b) => a.name.localeCompare(b.name, "tr"))
 }
 
-/** b/music veya kerem root'taki ilk .mp3 (sıralı) */
+/** b/music veya proje root'taki ilk .mp3 (sıralı) */
 function getStreamPath() {
   const list = getMp3List(MUSIC_DIR)
   if (list.length > 0) return list[0].path
-  const rootList = getMp3List(KEREM_ROOT)
+  const rootList = getMp3List(LFORADIO_ROOT)
   return rootList.length > 0 ? rootList[0].path : null
 }
 
@@ -46,11 +46,11 @@ app.get("/api/audio/current", (req, res) => {
   })
 })
 
-/** GET /api/audio/stream — tek MP3 stream (static/music veya kerem root) */
+/** GET /api/audio/stream — tek MP3 stream (static/music veya proje root) */
 app.get("/api/audio/stream", (req, res) => {
   const filePath = getStreamPath()
   if (!filePath) {
-    return res.status(404).json({ error: "Hiç MP3 dosyası bulunamadı. kerem/b/music veya kerem köküne .mp3 koyun." })
+    return res.status(404).json({ error: "Hiç MP3 dosyası bulunamadı. lforadio/b/music veya proje köküne .mp3 koyun." })
   }
   const stat = fs.statSync(filePath)
   const fileSize = stat.size
@@ -82,7 +82,7 @@ app.get("/api/audio/stream", (req, res) => {
 /** GET /api/audio/list — MP3 listesi (isim sıralı) */
 app.get("/api/audio/list", (req, res) => {
   let list = getMp3List(MUSIC_DIR)
-  if (list.length === 0) list = getMp3List(KEREM_ROOT)
+  if (list.length === 0) list = getMp3List(LFORADIO_ROOT)
   const items = list.map(({ name }) => ({
     name,
     displayName: name.replace(/\.mp3$/i, ""),
@@ -133,11 +133,11 @@ if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
 
 app.listen(PORT, () => {
   const base = `http://localhost:${PORT}`
-  console.log(`KG Radio backend ${base}`)
+  console.log(`LFO Radio backend ${base}`)
   if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
     console.log("Frontend (production) bu porttan sunuluyor.")
   }
   const p = getStreamPath()
   if (p) console.log("Stream dosyası:", path.basename(p))
-  else console.log("Uyarı: Hiç MP3 bulunamadı. kerem/b/music veya kerem köküne .mp3 ekleyin.")
+  else console.log("Uyarı: Hiç MP3 bulunamadı. lforadio/b/music veya proje köküne .mp3 ekleyin.")
 })
