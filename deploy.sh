@@ -1,4 +1,4 @@
-git #!/bin/bash
+#!/bin/bash
 # LfoRadio – npm kurulumu + nginx ayarı
 # Proje kökünden: ./deploy.sh  veya  bash deploy.sh
 
