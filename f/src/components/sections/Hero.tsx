@@ -40,7 +40,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative z-0 flex items-center box-border border-b border-x border-border min-h-[calc(100vh-54px)] h-[calc(100vh-54px)] max-h-[calc(100vh-54px)] overflow-hidden w-full min-w-0"
+      className="relative z-0 flex items-center box-border min-h-[calc(100vh-54px)] h-[calc(100vh-54px)] max-h-[calc(100vh-54px)] overflow-hidden w-full min-w-0"
       aria-label="Ana içerik"
     >
       {/* Arka plan videoları – sırayla oynar */}

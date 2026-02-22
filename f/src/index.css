@@ -102,7 +102,6 @@
 @layer base {
   * {
     @apply outline-ring/50;
-    border-color: var(--border);
     font-family: "Alumni Sans Pinstripe", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: var(--letter-spacing);
   }
@@ -157,10 +156,36 @@
   .shadow-brutal-lg {
     box-shadow: none;
   }
-  /* Nav link: hover'da #777777 glitch arka plan */
+  /* Logo (LfoRadio) hover: glitch arka plan */
+  .logo-link-glitch {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .logo-link-glitch::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #777777;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    border-radius: 2px;
+  }
+  .logo-link-glitch:hover::before {
+    opacity: 1;
+    animation: nav-glitch-bg 0.35s steps(5) forwards;
+  }
+  .logo-link-glitch > span {
+    position: relative;
+    z-index: 1;
+  }
+  /* Nav link: hover'da #777777 glitch arka plan; nav yüksekliği içinde kalır */
   .nav-link-glitch {
     position: relative;
     overflow: hidden;
+    min-height: 0;
+    isolation: isolate;
   }
   .nav-link-glitch::before {
     content: "";
@@ -170,13 +195,88 @@
     z-index: -1;
     opacity: 0;
     transition: opacity 0.12s ease;
+    border-radius: 2px;
   }
+  /* Eski glitch arka plan: disable (silinmedi, tekrar açmak için opacity: 1 + animation aç) */
   .nav-link-glitch:hover::before {
-    opacity: 1;
-    animation: nav-glitch-bg 0.35s steps(5) forwards;
+    opacity: 0;
+    /* animation: nav-glitch-bg 0.35s steps(5) forwards; */
   }
-  .nav-link-glitch span {
+  .nav-link-glitch > span:last-child {
     position: relative;
     z-index: 1;
+  }
+  /* Ekolayzır barlar: hover'da görünür, aşağı doğru, her zaman tuş (yazı) arkasında */
+  .nav-eq-bars {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    overflow: hidden;
+  }
+  .nav-link-glitch:hover .nav-eq-bars {
+    opacity: 0.5;
+  }
+  /* Canlı Yayın, Hakkımızda, Dinle: efekt genişliği ~%80 */
+  .nav-link-effect-narrow .nav-eq-bars {
+    left: 10%;
+    right: 10%;
+  }
+  .nav-eq-bar {
+    width: 3px;
+    min-width: 3px;
+    height: calc((var(--eq-h, 50) / 100) * 100%);
+    min-height: 4px;
+    background: rgba(59, 130, 246, 0.9);
+    align-self: flex-start;
+    border-radius: 1px;
+    transform-origin: top;
+    animation: nav-eq-pulse 0.6s ease-in-out infinite;
+  }
+  .nav-eq-bar:nth-child(1) { animation-delay: 0ms; }
+  .nav-eq-bar:nth-child(2) { animation-delay: 40ms; }
+  .nav-eq-bar:nth-child(3) { animation-delay: 80ms; }
+  .nav-eq-bar:nth-child(4) { animation-delay: 120ms; }
+  .nav-eq-bar:nth-child(5) { animation-delay: 160ms; }
+  .nav-eq-bar:nth-child(6) { animation-delay: 200ms; }
+  .nav-eq-bar:nth-child(7) { animation-delay: 240ms; }
+  .nav-eq-bar:nth-child(8) { animation-delay: 280ms; }
+  .nav-eq-bar:nth-child(9) { animation-delay: 320ms; }
+  .nav-eq-bar:nth-child(10) { animation-delay: 360ms; }
+  .nav-eq-bar:nth-child(11) { animation-delay: 400ms; }
+  .nav-eq-bar:nth-child(12) { animation-delay: 440ms; }
+  .nav-eq-bar:nth-child(13) { animation-delay: 480ms; }
+  .nav-eq-bar:nth-child(14) { animation-delay: 520ms; }
+  .nav-eq-bar:nth-child(15) { animation-delay: 560ms; }
+  .nav-eq-bar:nth-child(16) { animation-delay: 600ms; }
+  .nav-eq-bar:nth-child(17) { animation-delay: 640ms; }
+  .nav-eq-bar:nth-child(18) { animation-delay: 680ms; }
+  .nav-eq-bar:nth-child(19) { animation-delay: 720ms; }
+  .nav-eq-bar:nth-child(20) { animation-delay: 760ms; }
+  .nav-eq-bar:nth-child(21) { animation-delay: 800ms; }
+  .nav-eq-bar:nth-child(22) { animation-delay: 840ms; }
+  .nav-eq-bar:nth-child(23) { animation-delay: 880ms; }
+  .nav-eq-bar:nth-child(24) { animation-delay: 920ms; }
+  .nav-eq-bar:nth-child(25) { animation-delay: 960ms; }
+  .nav-eq-bar:nth-child(26) { animation-delay: 1000ms; }
+  .nav-eq-bar:nth-child(27) { animation-delay: 1040ms; }
+  .nav-eq-bar:nth-child(28) { animation-delay: 1080ms; }
+  .nav-eq-bar:nth-child(29) { animation-delay: 1120ms; }
+  .nav-eq-bar:nth-child(30) { animation-delay: 1160ms; }
+  .nav-eq-bar:nth-child(31) { animation-delay: 1200ms; }
+  .nav-eq-bar:nth-child(32) { animation-delay: 1240ms; }
+  .nav-eq-bar:nth-child(33) { animation-delay: 1280ms; }
+  .nav-eq-bar:nth-child(34) { animation-delay: 1320ms; }
+  .nav-eq-bar:nth-child(35) { animation-delay: 1360ms; }
+  .nav-eq-bar:nth-child(36) { animation-delay: 1400ms; }
+  @keyframes nav-eq-pulse {
+    0%, 100% { transform: scaleY(0.6); opacity: 0.85; }
+    50% { transform: scaleY(1); opacity: 1; }
   }
 }

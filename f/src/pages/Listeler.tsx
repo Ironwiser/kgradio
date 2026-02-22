@@ -15,7 +15,7 @@ export interface TrackItem {
   artworkUrl?: string
 }
 
-export function Spotify() {
+export function Listeler() {
   const [trackList, setTrackList] = React.useState<TrackItem[]>([])
   const [selectedTrack, setSelectedTrack] = React.useState<TrackItem | null>(null)
   const [listLoading, setListLoading] = React.useState(true)
@@ -33,6 +33,24 @@ export function Spotify() {
   const playerSrc = selectedTrack ? selectedTrack.url : DEFAULT_STREAM_URL
   const playerTrackName = selectedTrack ? selectedTrack.displayName : undefined
   const playerArtworkUrl = selectedTrack?.artworkUrl
+  const currentIndex = selectedTrack
+    ? trackList.findIndex((t) => t.url === selectedTrack.url)
+    : -1
+  const canGoPrevious = currentIndex > 0
+  const canGoNext =
+    currentIndex >= 0
+      ? currentIndex < trackList.length - 1
+      : trackList.length > 0
+  const handlePrevious = () => {
+    if (currentIndex > 0) setSelectedTrack(trackList[currentIndex - 1])
+  }
+  const handleNext = () => {
+    if (currentIndex >= 0 && currentIndex < trackList.length - 1) {
+      setSelectedTrack(trackList[currentIndex + 1])
+    } else if (currentIndex === -1 && trackList.length > 0) {
+      setSelectedTrack(trackList[0])
+    }
+  }
 
   return (
     <section
@@ -41,7 +59,7 @@ export function Spotify() {
         "bg-[#111111]"
       )}
     >
-      <div className="container relative z-10 mx-auto max-w-3xl min-w-0">
+      <div className="container relative z-10 mx-auto flex max-w-3xl min-w-0 flex-col items-stretch px-0">
         <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
           LfoRadio · Çalma Listeleri
         </h1>
@@ -52,10 +70,14 @@ export function Spotify() {
           artworkUrl={playerArtworkUrl}
           trackInfoUrl={selectedTrack ? undefined : "/api/audio/current"}
           autoPlay={!!selectedTrack}
-          className="border-border bg-[#111111]"
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
+          className="w-full max-w-full shrink-0 bg-[#111111]"
         />
 
-        <div className="mt-10 rounded-lg border border-border bg-[#111111] p-5 sm:p-6">
+        <div className="mt-10 w-full shrink-0 rounded-lg border border-border bg-[#111111] p-5 sm:p-6">
           <h2 className="mb-4 flex items-center gap-3 text-xl font-medium text-white/80">
             <Music className="h-5 w-5" />
             Çalma Listeleri

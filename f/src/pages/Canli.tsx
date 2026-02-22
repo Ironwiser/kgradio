@@ -8,7 +8,7 @@ const LIVE_STREAM_URL =
 export function Canli() {
   return (
     <section className="relative min-h-[calc(100vh-4rem)] px-4 py-6 sm:py-12 bg-[#111111]">
-      <div className="container relative z-10 mx-auto max-w-3xl min-w-0">
+      <div className="relative z-10 mx-auto w-full max-w-3xl min-w-0">
         <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
           LfoRadio · Canlı Yayın
         </h1>

@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Play, Pause, Volume2, VolumeX, Music } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Play, Pause, Volume2, VolumeX, Music, SkipBack, SkipForward } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export interface PlayerProps {
@@ -18,10 +17,18 @@ export interface PlayerProps {
   trackInfoUrl?: string
   /** true ise src değişince otomatik oynat (listeden tıklanınca) */
   autoPlay?: boolean
+  /** Önceki parçaya geç (liste varsa) */
+  onPrevious?: () => void
+  /** Sonraki parçaya geç (liste varsa) */
+  onNext?: () => void
+  /** Önceki parça var mı (buton disabled) */
+  canGoPrevious?: boolean
+  /** Sonraki parça var mı (buton disabled) */
+  canGoNext?: boolean
   className?: string
 }
 
-export function Player({ src, title, trackName: trackNameProp, artworkUrl, trackInfoUrl, autoPlay, className }: PlayerProps) {
+export function Player({ src, title, trackName: trackNameProp, artworkUrl, trackInfoUrl, autoPlay, onPrevious, onNext, canGoPrevious = true, canGoNext = true, className }: PlayerProps) {
   const audioRef = React.useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = React.useState(false)
   const [volume, setVolume] = React.useState(1)
@@ -78,7 +85,10 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     const audio = audioRef.current
     if (!audio) return
 
-    const onPlay = () => setIsPlaying(true)
+    const onPlay = () => {
+      setIsPlaying(true)
+      setError(null)
+    }
     const onPause = () => setIsPlaying(false)
     const onEnded = () => {
       setIsPlaying(false)
@@ -131,7 +141,10 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     const shouldPlay = autoPlay || isPlaying
     if (shouldPlay) {
       setIsLoading(true)
-      audio.play().catch(() => setError("Çalınamadı.")).finally(() => setIsLoading(false))
+      audio.play().catch((e: unknown) => {
+        const name = (e as { name?: string })?.name
+        if (name !== "NotAllowedError") setError("Çalınamadı.")
+      }).finally(() => setIsLoading(false))
     }
   }, [src, autoPlay])
 
@@ -214,22 +227,27 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   const volumeVisible = volumeOpen
 
   const sliderTrackClass =
-    "h-1.5 w-full appearance-none rounded-full bg-muted/80 accent-primary transition-colors [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-110"
+    "h-1.5 w-full appearance-none rounded-full bg-white/20 accent-white transition-colors [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-110 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0"
 
   return (
     <div
       className={cn(
-        "flex overflow-hidden rounded-lg border border-border/40 bg-card",
+        "flex flex-col overflow-hidden rounded-lg border border-border bg-[#1a1a1a] min-w-0 w-full",
+        "gap-3 px-3 py-4 sm:gap-0 sm:grid sm:grid-cols-[auto_1fr] sm:items-stretch sm:pl-3 sm:pr-4 sm:py-4 md:pl-4 md:pr-5 md:py-5 lg:pl-5 lg:pr-6 lg:py-5 xl:pl-5 xl:pr-6 xl:py-6",
+        "max-sm:items-center",
         className
       )}
     >
       <audio ref={audioRef} preload="none" />
-      {/* Sol: parça/albüm görseli — player ile aynı boşluk (p-4 sm:p-5) */}
-      <div className="flex shrink-0 items-center justify-center p-4 pt-4 sm:p-5 sm:pt-5" aria-hidden>
+      {/* Sol: resim alanı – sm+ grid’de sağ sütunla eşit genişlik (1fr) */}
+      <div
+        className="flex w-full shrink-0 items-center justify-center pb-0 sm:h-32 sm:w-32 sm:pb-0 md:h-36 md:w-36 lg:h-40 lg:w-40 xl:h-44 xl:w-44 max-sm:aspect-square max-sm:h-auto"
+        aria-hidden
+      >
         <div
           className={cn(
-            "flex h-36 w-36 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-40 sm:w-40",
-            resolvedArtworkUrl && !artworkLoadFailed ? "bg-muted" : "bg-[#111111]"
+            "flex h-full w-full shrink-0 items-center justify-center overflow-hidden rounded-xl md:rounded-2xl",
+            resolvedArtworkUrl && !artworkLoadFailed ? "bg-white/5" : "bg-white/[0.06]"
           )}
         >
           {resolvedArtworkUrl && !artworkLoadFailed ? (
@@ -241,37 +259,37 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             />
           ) : (
             <span className="relative flex items-center justify-center">
-              {/* Dekoratif halka */}
-              <span
-                className="absolute h-20 w-20 rounded-full border-2 border-white/10 sm:h-24 sm:w-24"
-                aria-hidden
-              />
-              <span
-                className="absolute h-28 w-28 rounded-full border border-white/5 sm:h-32 sm:w-32"
-                aria-hidden
-              />
-              <Music className="relative h-12 w-12 text-white/40 drop-shadow sm:h-14 sm:w-14" />
+              <Music className="relative h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-white/30" />
             </span>
           )}
         </div>
       </div>
-      {/* Sağ: başlık, progress, kontroller */}
-      <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5">
-        {title && (
-          <h3 className="mb-2 text-base font-medium capitalize text-muted-foreground">
-            {title}
-          </h3>
-        )}
-        {trackName && (
-          <p
-            className="mb-4 truncate text-2xl font-semibold text-foreground"
-            title={trackName}
-          >
-            {trackName}
-          </p>
-        )}
-        {showProgressBar && (
-          <div className="mb-4 w-full">
+      {/* Sağ: yazı ve tuşlar – mobilde tam genişlik, sm+ soldaki resim yüksekliğiyle aynı */}
+      <div className="flex min-w-0 w-full flex-1 flex-col justify-center px-0 sm:min-w-0 sm:w-auto sm:pl-3 md:pl-4 lg:pl-5">
+        <div
+          className={cn(
+            "flex flex-col min-w-0",
+            "sm:min-h-32 md:min-h-36 lg:min-h-40 xl:min-h-44 sm:justify-between",
+            "gap-2 sm:gap-0"
+          )}
+        >
+          <div className="min-w-0">
+            {title && (
+              <h3 className="mb-0.5 sm:mb-0 text-[10px] sm:text-xs md:text-sm lg:text-base font-medium uppercase tracking-wider text-white/50">
+                {title}
+              </h3>
+            )}
+            {trackName && (
+              <p
+                className="truncate text-base font-semibold text-white sm:text-lg md:text-xl lg:text-2xl"
+                title={trackName}
+              >
+                {trackName}
+              </p>
+            )}
+          </div>
+          {showProgressBar && (
+            <div className="w-full min-w-0 shrink-0">
             <input
               type="range"
               min={0}
@@ -282,10 +300,10 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               onPointerDown={onSeekPointerDown}
               onPointerUp={onSeekPointerUp}
               onPointerLeave={onSeekPointerUp}
-              className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4")}
+              className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:min-h-[20px] [&::-webkit-slider-thumb]:min-w-[20px] sm:[&::-webkit-slider-thumb]:h-3.5 sm:[&::-webkit-slider-thumb]:w-3.5")}
               aria-label="Şarkı ilerlemesi"
             />
-            <div className="mt-2 flex justify-between text-sm text-muted-foreground">
+            <div className="mt-1.5 sm:mt-2 flex justify-between text-xs sm:text-sm text-white/50">
               <span>{formatTime(currentTime)}</span>
               <span>
                 {Number.isFinite(duration) && duration > 0
@@ -295,26 +313,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             </div>
           </div>
         )}
-        <div className="flex flex-wrap items-center gap-5">
-          <Button
-            type="button"
-            size="icon"
-            className="h-14 w-14 shrink-0 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
-            onClick={togglePlay}
-            disabled={!canPlay || isLoading}
-            aria-label={isPlaying ? "Duraklat" : "Oynat"}
-          >
-            {isLoading ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-            ) : isPlaying ? (
-              <Pause className="h-5 w-5" />
-            ) : (
-              <Play className="h-5 w-5 ml-0.5" />
-            )}
-          </Button>
           <div
             ref={volumeRef}
-            className="flex flex-wrap items-center gap-2 min-w-0 flex-1"
+            className="flex min-w-0 flex-1 flex-row flex-wrap items-center gap-1 sm:gap-2"
             onMouseEnter={() => {
               if (!window.matchMedia("(pointer: coarse)").matches) setVolumeOpen(true)
             }}
@@ -322,34 +323,93 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               if (!window.matchMedia("(pointer: coarse)").matches) setVolumeOpen(false)
             }}
           >
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 shrink-0 rounded-full touch-manipulation"
-              onPointerDown={handleVolumeButtonPointerDown}
-              onClick={() => {
-                if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return
-                setVolumeOpen((o) => !o)
-              }}
-              aria-label={isMuted ? "Sesi aç" : "Sesi kapat"}
-              aria-expanded={volumeVisible}
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX className="h-5 w-5" />
-              ) : (
-                <Volume2 className="h-5 w-5" />
-              )}
-            </Button>
-            {/* Mobilde ses kaydırıcısı tam genişlikte alt satıra iner; masaüstünde satır içi */}
-            <div
-              className={cn(
-                "flex h-9 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-popover px-3 shadow-xl transition-all duration-200",
-                volumeVisible
-                  ? "w-full min-w-0 basis-full opacity-100 sm:basis-auto sm:w-40 sm:min-w-[10rem] sm:px-4"
-                  : "w-0 min-w-0 basis-0 border-0 bg-transparent px-0 opacity-0 pointer-events-none"
-              )}
-            >
+          {/* Tuşlar tek sıra; volume bar yanda sığarsa yanda, sığmazsa alta sarar */}
+          <div
+            className={cn(
+              "grid w-full min-w-0 max-w-[11rem] shrink-0 gap-1 sm:max-w-[13rem] sm:gap-2 md:gap-3",
+              onPrevious && onNext ? "grid-cols-4" : onPrevious || onNext ? "grid-cols-3" : "grid-cols-2"
+            )}
+            style={{
+              aspectRatio: onPrevious && onNext ? "4/1" : onPrevious || onNext ? "3/1" : "2/1",
+              gridAutoRows: "1fr",
+            }}
+          >
+            <div className="flex min-w-0 items-center justify-center [min-width:0]">
+              <button
+                type="button"
+                onClick={togglePlay}
+                disabled={!canPlay || isLoading}
+                aria-label={isPlaying ? "Duraklat" : "Oynat"}
+                className={cn(
+                  "flex aspect-square w-full min-w-0 items-center justify-center rounded-full transition-transform touch-manipulation",
+                  "bg-white/95 text-black sm:bg-white",
+                  "hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                )}
+              >
+                {isLoading ? (
+                  <span className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 animate-spin rounded-full border-2 border-black border-t-transparent" />
+                ) : isPlaying ? (
+                  <Pause className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 shrink-0 ml-0" />
+                ) : (
+                  <Play className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 shrink-0 ml-0.5" />
+                )}
+              </button>
+            </div>
+            {onPrevious && (
+              <div className="flex min-w-0 items-center justify-center">
+                <button
+                  type="button"
+                  onClick={onPrevious}
+                  disabled={!canGoPrevious}
+                  aria-label="Önceki parça"
+                  className="flex aspect-square w-full min-w-0 items-center justify-center rounded-full bg-white/5 text-white/80 transition-colors transition-transform touch-manipulation hover:scale-[1.02] hover:bg-white/10 hover:text-white active:scale-95 disabled:pointer-events-none disabled:opacity-50 sm:bg-transparent sm:text-white/70"
+                >
+                  <SkipBack className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 shrink-0" />
+                </button>
+              </div>
+            )}
+            {onNext && (
+              <div className="flex min-w-0 items-center justify-center">
+                <button
+                  type="button"
+                  onClick={onNext}
+                  disabled={!canGoNext}
+                  aria-label="Sonraki parça"
+                  className="flex aspect-square w-full min-w-0 items-center justify-center rounded-full bg-white/5 text-white/80 transition-colors transition-transform touch-manipulation hover:scale-[1.02] hover:bg-white/10 hover:text-white active:scale-95 disabled:pointer-events-none disabled:opacity-50 sm:bg-transparent sm:text-white/70"
+                >
+                  <SkipForward className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 shrink-0" />
+                </button>
+              </div>
+            )}
+            <div className="flex min-w-0 items-center justify-center">
+              <button
+                type="button"
+                onPointerDown={handleVolumeButtonPointerDown}
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return
+                  setVolumeOpen((o) => !o)
+                }}
+                aria-label={isMuted ? "Sesi aç" : "Sesi kapat"}
+                aria-expanded={volumeVisible}
+                className="flex aspect-square w-full min-w-0 items-center justify-center rounded-full bg-white/5 text-white/80 transition-colors transition-transform touch-manipulation hover:scale-[1.02] hover:bg-white/10 hover:text-white active:scale-95 sm:bg-transparent sm:text-white/70"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 shrink-0" />
+                ) : (
+                  <Volume2 className="h-[55%] w-[55%] min-h-[12px] min-w-[12px] max-h-5 max-w-5 shrink-0" />
+                )}
+              </button>
+            </div>
+          </div>
+          {/* Ses kaydı: yanda sığarsa yanda, sığmazsa (min 8rem) alta sarar */}
+          <div
+            className={cn(
+              "flex h-9 shrink-0 items-center overflow-hidden rounded-full bg-white/10 px-3 transition-all duration-200",
+              volumeVisible
+                ? "min-w-[8rem] shrink-0 flex-1 opacity-100 px-4"
+                : "w-0 min-w-0 flex-none px-0 opacity-0 pointer-events-none"
+            )}
+          >
               <input
                 type="range"
                 min={0}
@@ -365,16 +425,16 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
           </div>
         </div>
         {error && (
-          <p className="mt-3 text-sm text-destructive" role="alert">
+          <p className="mt-2 text-xs sm:text-sm text-red-400 shrink-0" role="alert">
             {error}
           </p>
         )}
         {!hasSource && (
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-1 text-xs sm:text-sm text-white/50 shrink-0">
             Yayın başlatmak için bir stream URL'si ekleyin.
           </p>
         )}
+        </div>
       </div>
-    </div>
   )
 }
