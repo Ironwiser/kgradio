@@ -1,18 +1,31 @@
-import express from "express"
-import cors from "cors"
+import dotenv from "dotenv"
 import path from "path"
-import fs from "fs"
 import { fileURLToPath } from "url"
-import { parseFile } from "music-metadata"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: path.join(__dirname, ".env") })
+
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+import fs from "fs"
+import { parseFile } from "music-metadata"
+import userRoutes from "./routes/userRoutes.js"
 const LFORADIO_ROOT = path.join(__dirname, "..")
 const MUSIC_DIR = path.join(__dirname, "music")
+const FRONTEND_DIST = path.join(__dirname, "..", "f", "dist")
+const ANIMATION_DIR_PUBLIC = path.join(LFORADIO_ROOT, "f", "public", "animasyon")
+const ANIMATION_DIR = fs.existsSync(path.join(FRONTEND_DIST, "animasyon"))
+  ? path.join(FRONTEND_DIST, "animasyon")
+  : ANIMATION_DIR_PUBLIC
 
 const app = express()
 const PORT = process.env.PORT || 3010
 
-app.use(cors())
+app.use(cors({ origin: true, credentials: true }))
+app.use(express.json())
+app.use(cookieParser())
+app.use("/api", userRoutes)
 
 /** Klasördeki .mp3 dosyalarını isme göre sıralı döner */
 function getMp3List(dir) {
@@ -122,8 +135,23 @@ app.get("/api/audio/file/:filename", (req, res) => {
   fs.createReadStream(filePath).pipe(res)
 })
 
+/** GET /api/animasyon/list — animasyon klasöründeki video dosyalarını isme göre sıralı döner (public veya dist) */
+function getAnimationList() {
+  const dir = ANIMATION_DIR
+  if (!dir || !fs.existsSync(dir)) return []
+  const ext = [".mp4", ".webm", ".mov"]
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((f) => f.isFile() && ext.some((e) => f.name.toLowerCase().endsWith(e)))
+    .map((f) => f.name)
+    .sort((a, b) => a.localeCompare(b, "tr"))
+}
+app.get("/api/animasyon/list", (req, res) => {
+  const files = getAnimationList()
+  res.json({ files })
+})
+
 /** Production: frontend build'ini sun (tek portta site + API) */
-const FRONTEND_DIST = path.join(__dirname, "..", "f", "dist")
 if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST))
   app.get(/.*/, (req, res) => {
