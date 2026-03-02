@@ -17,6 +17,25 @@ echo "→ f: eski node_modules siliniyor, npm install + build"
 echo "→ b: eski node_modules siliniyor, npm install"
 (cd "$ROOT_DIR/b" && rm -rf node_modules && npm install)
 
+echo "→ PostgreSQL: lforadio veritabanı ve şema (opsiyonel)"
+if command -v psql &>/dev/null; then
+  DB_PASS=""
+  [ -f "$ROOT_DIR/b/.env" ] && DB_PASS=$(grep -E "^DB_PASSWORD=" "$ROOT_DIR/b/.env" | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//") || true
+  PGPASSWORD="${PGPASSWORD:-$DB_PASS}"
+  if [ -n "$PGPASSWORD" ]; then
+    echo "  Veritabanı oluşturuluyor (varsa atlanır)..."
+    (cd "$ROOT_DIR/b/sql" && PGPASSWORD="$PGPASSWORD" psql -h localhost -p 5432 -U postgres -d postgres -f 00_create_database.sql) 2>/dev/null || true
+    echo "  Tablolar ve seed uygulanıyor..."
+    (cd "$ROOT_DIR/b/sql" && PGPASSWORD="$PGPASSWORD" psql -h localhost -p 5432 -U postgres -d lforadio -f run_all.sql) && echo "  DB kurulumu tamam." || echo "  UYARI: run_all.sql başarısız (DB zaten kurulmuş olabilir)."
+  else
+    echo "  Atlanıyor: b/.env içinde DB_PASSWORD veya ortamda PGPASSWORD yok."
+    echo "  Elle kurmak için: PGPASSWORD='...' psql -h localhost -U postgres -d postgres -f b/sql/00_create_database.sql"
+    echo "                    PGPASSWORD='...' psql -h localhost -U postgres -d lforadio -f b/sql/run_all.sql"
+  fi
+else
+  echo "  Atlanıyor: psql bulunamadı (PostgreSQL client kurulu değil)."
+fi
+
 echo "→ AzuraCast (Docker) kurulumu / güncellemesi"
 
 # Docker yoksa kur
