@@ -45,18 +45,56 @@ function getStreamPath() {
   return rootList.length > 0 ? rootList[0].path : null
 }
 
+function resolveMp3Path(filename) {
+  const safe = path.basename(filename)
+  const inMusic = path.join(MUSIC_DIR, safe)
+  if (fs.existsSync(inMusic)) return inMusic
+  const inRoot = path.join(LFORADIO_ROOT, safe)
+  if (fs.existsSync(inRoot)) return inRoot
+  return null
+}
+
+/** Dosya değişince geçersiz olan kapak önbelleği */
+const artworkCache = new Map()
+
+async function fileHasArtwork(filePath) {
+  let mtimeMs = 0
+  try {
+    mtimeMs = fs.statSync(filePath).mtimeMs
+  } catch {
+    return false
+  }
+  const cached = artworkCache.get(filePath)
+  if (cached && cached.mtimeMs === mtimeMs) return cached.hasArtwork
+
+  try {
+    const metadata = await parseFile(filePath)
+    const hasArtwork = Boolean(metadata.common.picture?.[0]?.data)
+    artworkCache.set(filePath, { mtimeMs, hasArtwork })
+    return hasArtwork
+  } catch {
+    artworkCache.set(filePath, { mtimeMs, hasArtwork: false })
+    return false
+  }
+}
+
+function artworkUrlForFilename(filename) {
+  return `/api/audio/artwork/${encodeURIComponent(filename)}`
+}
+
 /** GET /api/audio/current — çalan parça bilgisi (stream ile aynı dosya) */
-app.get("/api/audio/current", (req, res) => {
+app.get("/api/audio/current", async (req, res) => {
   const filePath = getStreamPath()
   if (!filePath) {
     return res.status(404).json({ error: "Parça bulunamadı.", name: null })
   }
   const filename = path.basename(filePath)
   const name = filename.replace(/\.mp3$/i, "")
-  res.json({
-    name,
-    artworkUrl: `/api/audio/artwork/${encodeURIComponent(filename)}`,
-  })
+  const payload = { name }
+  if (await fileHasArtwork(filePath)) {
+    payload.artworkUrl = artworkUrlForFilename(filename)
+  }
+  res.json(payload)
 })
 
 /** GET /api/audio/stream — tek MP3 stream (static/music veya proje root) */
@@ -92,16 +130,23 @@ app.get("/api/audio/stream", (req, res) => {
   }
 })
 
-/** GET /api/audio/list — MP3 listesi (isim sıralı) */
-app.get("/api/audio/list", (req, res) => {
+/** GET /api/audio/list — MP3 listesi (isim sıralı); artworkUrl yalnızca gömülü kapak varsa */
+app.get("/api/audio/list", async (req, res) => {
   let list = getMp3List(MUSIC_DIR)
   if (list.length === 0) list = getMp3List(LFORADIO_ROOT)
-  const items = list.map(({ name }) => ({
-    name,
-    displayName: name.replace(/\.mp3$/i, ""),
-    url: `/api/audio/file/${encodeURIComponent(name)}`,
-    artworkUrl: `/api/audio/artwork/${encodeURIComponent(name)}`,
-  }))
+  const items = await Promise.all(
+    list.map(async ({ name, path: filePath }) => {
+      const item = {
+        name,
+        displayName: name.replace(/\.mp3$/i, ""),
+        url: `/api/audio/file/${encodeURIComponent(name)}`,
+      }
+      if (await fileHasArtwork(filePath)) {
+        item.artworkUrl = artworkUrlForFilename(name)
+      }
+      return item
+    })
+  )
   res.json(items)
 })
 
@@ -111,8 +156,8 @@ app.get("/api/audio/artwork/:filename", async (req, res) => {
   if (!filename.toLowerCase().endsWith(".mp3")) {
     return res.status(400).json({ error: "Sadece .mp3 desteklenir." })
   }
-  const filePath = path.join(MUSIC_DIR, path.basename(filename))
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Dosya bulunamadı." })
+  const filePath = resolveMp3Path(filename)
+  if (!filePath) return res.status(404).json({ error: "Dosya bulunamadı." })
   try {
     const metadata = await parseFile(filePath)
     const picture = metadata.common.picture?.[0]
@@ -129,8 +174,8 @@ app.get("/api/audio/artwork/:filename", async (req, res) => {
 app.get("/api/audio/file/:filename", (req, res) => {
   const filename = decodeURIComponent(req.params.filename)
   if (!filename.toLowerCase().endsWith(".mp3")) return res.status(400).json({ error: "Sadece .mp3 desteklenir." })
-  const filePath = path.join(MUSIC_DIR, path.basename(filename))
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: "Dosya bulunamadı." })
+  const filePath = resolveMp3Path(filename)
+  if (!filePath) return res.status(404).json({ error: "Dosya bulunamadı." })
   res.setHeader("Content-Type", "audio/mpeg")
   fs.createReadStream(filePath).pipe(res)
 })
@@ -154,7 +199,11 @@ app.get("/api/animasyon/list", (req, res) => {
 /** Production: frontend build'ini sun (tek portta site + API) */
 if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST))
-  app.get(/.*/, (req, res) => {
+  // SPA fallback – JS/CSS 404'te index.html dönmesin (Safari'de beyaz ekran / "site açılmıyor" yapar)
+  app.get("*", (req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next()
+    const ext = path.extname(req.path)
+    if (ext && ext !== ".html") return res.status(404).end()
     res.sendFile(path.join(FRONTEND_DIST, "index.html"))
   })
 }

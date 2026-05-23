@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
+import { markAuthSession } from "@/lib/auth-session"
 
 export function Giris() {
   const navigate = useNavigate()
@@ -31,6 +32,7 @@ export function Giris() {
         return
       }
       const token = data.accessToken
+      markAuthSession()
       setAccessToken(token)
       const profileRes = await fetch("/api/profile", {
         headers: { Authorization: `Bearer ${token}` },

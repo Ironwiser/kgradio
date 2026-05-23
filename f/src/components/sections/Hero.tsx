@@ -8,6 +8,11 @@ const heroConfig = {
   ctaSecondary: { label: "Hakkımızda", href: "/rasgele" },
 }
 
+const heroCtaBase =
+  "hero-cta-glitch font-brutal-heading inline-flex box-border items-center justify-center min-h-11 sm:h-[52px] px-4 sm:px-6 py-2.5 sm:py-[12px] text-base sm:text-xl md:text-2xl font-semibold text-black touch-manipulation max-w-[240px] sm:max-w-none rounded-none text-center leading-tight sm:whitespace-nowrap"
+
+const heroCtaClass = heroCtaBase
+
 const FALLBACK_VIDEO = "WhatsApp Video 2026-02-07 at 03.07.32.mp4"
 
 export function Hero() {
@@ -30,8 +35,14 @@ export function Hero() {
     if (videoList.length === 0 || !videoRef.current) return
     const name = videoList[currentIndex % videoList.length]
     const src = "/animasyon/" + encodeURIComponent(name)
-    videoRef.current.src = src
-    videoRef.current.play().catch(() => {})
+    const video = videoRef.current
+    video.src = src
+    video.load()
+    // iOS Safari: otomatik oynatma yalnızca muted + playsInline ile çalışır; hata sayfayı kilitlemez
+    const playPromise = video.play()
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {})
+    }
   }, [videoList, currentIndex])
 
   const goNext = () => {
@@ -40,7 +51,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative z-0 flex items-center box-border min-h-[calc(100vh-54px)] h-[calc(100vh-54px)] max-h-[calc(100vh-54px)] overflow-hidden w-full min-w-0"
+      className="relative z-0 flex min-h-0 w-full min-w-0 flex-1 items-center overflow-hidden box-border"
       aria-label="Ana içerik"
     >
       {/* Arka plan videoları – sırayla oynar */}
@@ -49,6 +60,7 @@ export function Hero() {
           ref={videoRef}
           muted
           playsInline
+          preload="metadata"
           className="absolute inset-0 h-full w-full object-cover"
           aria-hidden
           onEnded={goNext}
@@ -56,7 +68,7 @@ export function Hero() {
         <div className="absolute inset-0 bg-black/50" aria-hidden />
       </div>
 
-      <div className="relative z-10 w-full min-w-0 px-3 sm:px-4 md:px-6 -translate-y-4 sm:-translate-y-10 box-border">
+      <div className="relative z-10 w-full min-w-0 px-3 pb-4 pt-2 sm:px-4 sm:pb-6 md:px-6 box-border">
         {/* Ortadaki blok – sade logo + slogan */}
         <div className="mx-auto w-full max-w-3xl min-w-0 text-center">
           <h1 className="font-logo text-5xl sm:text-6xl lg:text-7xl font-medium text-white">
@@ -67,17 +79,11 @@ export function Hero() {
           </p>
           {/* CTA – masaüstünde elegant, mobilde dar/kompakt (max genişlik + gerekirse 2 satır) */}
           <div className="mt-8 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center max-w-full">
-            <Link
-              to={heroConfig.ctaPrimary.href}
-              className="font-brutal-heading inline-flex items-center justify-center min-h-11 sm:h-[52px] px-4 sm:px-6 py-2.5 sm:py-[12px] text-base sm:text-xl md:text-2xl font-semibold text-black bg-white hover:bg-neutral-200 transition-colors touch-manipulation max-w-[240px] sm:max-w-none rounded-none text-center leading-tight sm:whitespace-nowrap"
-            >
-              {heroConfig.ctaPrimary.label}
+            <Link to={heroConfig.ctaPrimary.href} className={heroCtaClass}>
+              <span>{heroConfig.ctaPrimary.label}</span>
             </Link>
-            <Link
-              to={heroConfig.ctaSecondary.href}
-              className="font-brutal-heading inline-flex items-center justify-center min-h-11 sm:h-[52px] px-4 sm:px-6 py-2.5 sm:py-[12px] text-base sm:text-xl md:text-2xl font-semibold text-black bg-[#777777] hover:bg-white transition-colors touch-manipulation max-w-[240px] sm:max-w-none rounded-none text-center leading-tight sm:whitespace-nowrap"
-            >
-              {heroConfig.ctaSecondary.label}
+            <Link to={heroConfig.ctaSecondary.href} className={heroCtaClass}>
+              <span>{heroConfig.ctaSecondary.label}</span>
             </Link>
           </div>
         </div>

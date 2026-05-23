@@ -6,6 +6,11 @@ import {
   useCallback,
   type ReactNode,
 } from "react"
+import {
+  markAuthSession,
+  clearAuthSession,
+  hasAuthSession,
+} from "@/lib/auth-session"
 
 export type UserType = {
   id: number
@@ -32,13 +37,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserType | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const logout = useCallback(() => {
+  const clearLocalAuth = useCallback(() => {
     setAccessToken(null)
     setUser(null)
-    fetch("/api/logout", { method: "POST", credentials: "include" })
+    clearAuthSession()
   }, [])
 
+  const logout = useCallback(() => {
+    clearLocalAuth()
+    fetch("/api/logout", { method: "POST", credentials: "include" })
+  }, [clearLocalAuth])
+
   const refreshAccessToken = useCallback(async (): Promise<string | null> => {
+    if (!hasAuthSession()) return null
+
     try {
       const response = await fetch("/api/refresh", {
         method: "POST",
@@ -48,15 +60,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = await response.json()
         const newToken = data.accessToken ?? null
         setAccessToken(newToken)
+        if (newToken) markAuthSession()
         return newToken
       }
-      logout()
+      clearLocalAuth()
+      fetch("/api/logout", { method: "POST", credentials: "include" })
       return null
     } catch {
-      logout()
+      clearLocalAuth()
       return null
     }
-  }, [logout])
+  }, [clearLocalAuth])
 
   const authenticatedFetch = useCallback(
     async (url: string, options: RequestInit = {}) => {
@@ -83,6 +97,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     const init = async () => {
+      if (!hasAuthSession()) {
+        setIsLoading(false)
+        return
+      }
+
       const newToken = await refreshAccessToken()
       if (cancelled || !newToken) {
         setIsLoading(false)
@@ -100,12 +119,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false)
     }
     init()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [refreshAccessToken])
 
   const initialize = useCallback((token: string | null, userObj?: UserType | null) => {
     setAccessToken(token)
     if (userObj) setUser(userObj)
+    if (token) markAuthSession()
   }, [])
 
   return (

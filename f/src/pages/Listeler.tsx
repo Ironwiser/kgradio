@@ -94,10 +94,10 @@ export function Listeler() {
                     type="button"
                     onClick={() => setSelectedTrack(track)}
                     className={cn(
-                      "w-full px-3 py-2 text-left text-base font-medium min-h-[40px] flex items-center touch-manipulation",
+                      "font-brutal-heading w-full px-3 py-2 text-left text-base min-h-[40px] flex items-center touch-manipulation transition-colors",
                       selectedTrack?.url === track.url
-                        ? "bg-white text-black"
-                        : "bg-[#777777] text-black hover:bg-[#999999]"
+                        ? "playlist-track-active bg-[#facc15] text-black"
+                        : "bg-transparent text-white/70 hover:bg-white/[0.06] hover:text-white"
                     )}
                   >
                     {track.displayName}

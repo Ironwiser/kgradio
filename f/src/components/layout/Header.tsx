@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Radio, Menu, X, ChevronDown } from "lucide-react"
+import { Radio, Menu, X, UserRound, LogIn, UserPlus, ExternalLink, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 
@@ -57,7 +57,6 @@ export function Header() {
         <nav className="hidden lg:flex h-full flex-1 items-center justify-center gap-2 xl:gap-4 min-w-0">
           {navLinks.map(({ to, label }) => {
             const isActive = location.pathname.startsWith(to)
-            const effectNarrow = ["Canlı Yayın", "Hakkımızda", "Dinle"].includes(label)
             return (
               <Link
                 key={label}
@@ -65,77 +64,114 @@ export function Header() {
                 className={cn(
                   "nav-link-glitch font-brutal-heading flex h-full min-h-0 items-center justify-center transition-colors shrink-0",
                   "lg:text-base lg:px-2 xl:text-lg xl:px-3 2xl:text-xl 2xl:px-4",
-                  effectNarrow && "nav-link-effect-narrow",
                   isActive ? "text-white" : "text-white/70 hover:text-white"
                 )}
               >
-                <span className="nav-eq-bars" aria-hidden>
-                  {[30, 33, 37, 40, 44, 47, 51, 54, 58, 61, 65, 68, 72, 75, 79, 82, 86, 89, 100, 89, 86, 82, 79, 75, 72, 68, 65, 61, 58, 54, 51, 47, 44, 40, 37, 33].map((h, i) => (
-                    <span key={i} className="nav-eq-bar" style={{ ["--eq-h" as string]: String(h) }} />
-                  ))}
-                </span>
                 <span>{label}</span>
               </Link>
             )
           })}
         </nav>
 
-        <div className="relative flex items-center gap-0.5 lg:gap-1 shrink-0" ref={rightDropdownRef}>
-          {/* Masaüstü: aşağı açılan menü tetikleyicisi */}
+        <div className="relative flex h-full items-center gap-0.5 lg:gap-1 shrink-0" ref={rightDropdownRef}>
+          {/* Masaüstü: giriş / hesap tetikleyicisi */}
           <button
             type="button"
             onClick={() => setRightDropdownOpen((o) => !o)}
-            className="hidden lg:inline-flex font-brutal-heading items-center justify-center gap-1 px-2 py-1.5 xl:px-3 xl:py-2 2xl:px-4 text-xs xl:text-sm text-white/90 hover:text-white transition-colors"
+            className={cn(
+              "nav-link-glitch hidden lg:inline-flex font-brutal-heading",
+              "h-full min-h-0 max-w-[10rem] items-center justify-center gap-1.5 shrink-0 leading-none",
+              "bg-white/[0.04] px-2 xl:px-3 2xl:px-4",
+              "lg:text-base xl:text-lg 2xl:text-xl text-white/85 transition-colors touch-manipulation",
+              "hover:text-white",
+              rightDropdownOpen && "bg-white/[0.08] text-white"
+            )}
             aria-expanded={rightDropdownOpen}
             aria-haspopup="true"
           >
-            {user ? user.username : "Giriş"}
-            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", rightDropdownOpen && "rotate-180")} />
+            {user ? (
+              <span className="font-brutal-heading shrink-0 leading-none" aria-hidden>
+                {user.username.charAt(0).toUpperCase()}
+              </span>
+            ) : (
+              <UserRound className="auth-trigger-icon" strokeWidth={1} aria-hidden />
+            )}
+            <span className="truncate">{user ? user.username : "Giriş"}</span>
           </button>
 
-          {/* Aşağı açılan menü – Çıkış, DJ Girişi / Giriş Yap, Kayıt Ol, DJ Girişi */}
-          {rightDropdownOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 min-w-[160px] bg-[#111111] py-1 shadow-lg">
-              {user ? (
-                <>
-                  <div className="px-3 py-2 text-xs xl:text-sm text-white/70 font-brutal-heading">
+          <div
+            className={cn(
+              "auth-dropdown-panel absolute right-0 top-full z-50 mt-1 hidden py-2 lg:block",
+              rightDropdownOpen ? "auth-dropdown-open" : "auth-dropdown-closed"
+            )}
+            role="menu"
+            aria-hidden={!rightDropdownOpen}
+          >
+            {user ? (
+              <>
+                <div className="auth-dropdown-user">
+                  <span className="auth-dropdown-user-avatar font-brutal-heading" aria-hidden>
+                    {user.username.charAt(0).toUpperCase()}
+                  </span>
+                  <p className="font-brutal-heading text-base text-white whitespace-nowrap">
                     {user.username}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { closeRightDropdown(); logout() }}
-                    className="font-brutal-heading w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-white/5 hover:text-red-300 transition-colors"
-                  >
-                    Çıkış
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/giris"
-                    onClick={closeRightDropdown}
-                    className="font-brutal-heading block w-full px-3 py-2 text-left text-sm text-white/80 hover:bg-white/5 hover:text-white transition-colors"
-                  >
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="menuitem"
+                  tabIndex={rightDropdownOpen ? 0 : -1}
+                  onClick={() => { closeRightDropdown(); logout() }}
+                  className="auth-dropdown-item font-brutal-heading block text-left"
+                >
+                  <span className="auth-dropdown-item-inner text-red-400 hover:text-red-300">
+                    <LogOut className="auth-dropdown-item-icon" aria-hidden />
+                    Çıkış Yap
+                  </span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/giris"
+                  role="menuitem"
+                  tabIndex={rightDropdownOpen ? 0 : -1}
+                  onClick={closeRightDropdown}
+                  className="auth-dropdown-item font-brutal-heading block text-left"
+                >
+                  <span className="auth-dropdown-item-inner text-white/90 hover:text-white">
+                    <LogIn className="auth-dropdown-item-icon" aria-hidden />
                     Giriş Yap
-                  </Link>
-                  <Link
-                    to="/kayit"
-                    onClick={closeRightDropdown}
-                    className="font-brutal-heading block w-full px-3 py-2 text-left text-sm text-[#facc15] hover:bg-white/5 hover:text-[#fde047] transition-colors"
-                  >
+                  </span>
+                </Link>
+                <Link
+                  to="/kayit"
+                  role="menuitem"
+                  tabIndex={rightDropdownOpen ? 0 : -1}
+                  onClick={closeRightDropdown}
+                  className="auth-dropdown-item font-brutal-heading block text-left"
+                >
+                  <span className="auth-dropdown-item-inner text-[#facc15] hover:text-[#fde047]">
+                    <UserPlus className="auth-dropdown-item-icon text-[#facc15]" aria-hidden />
                     Kayıt Ol
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => { closeRightDropdown(); openDjPanel() }}
-                    className="font-brutal-heading w-full px-3 py-2 text-left text-sm text-[#facc15] hover:bg-white/5 hover:text-[#fde047] transition-colors"
-                  >
+                  </span>
+                </Link>
+                <div className="auth-dropdown-divider" aria-hidden />
+                <button
+                  type="button"
+                  role="menuitem"
+                  tabIndex={rightDropdownOpen ? 0 : -1}
+                  onClick={() => { closeRightDropdown(); openDjPanel() }}
+                  className="auth-dropdown-item font-brutal-heading block text-left"
+                >
+                  <span className="auth-dropdown-item-inner text-white/50 hover:text-white/85">
+                    <ExternalLink className="auth-dropdown-item-icon" aria-hidden />
                     DJ Girişi
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                  </span>
+                </button>
+              </>
+            )}
+          </div>
 
           {/* Hamburger: lg altında göster */}
           <button
@@ -175,19 +211,19 @@ export function Header() {
             </Link>
           ))}
 
-          {/* Sağ tuş takımı – menünün en altında: üstte kullanıcı adı, altta çıkış; sola hizalı */}
-          <div className="mt-4 pt-4 flex flex-col gap-2 items-start">
+          <div className="mt-4 border-t border-border pt-4 flex flex-col gap-2 items-stretch">
+            <p className="px-3 font-brutal-heading text-xs uppercase tracking-wider text-white/45">
+              {user ? "Hesap" : "Üyelik"}
+            </p>
             {user ? (
               <>
-                <span className="font-brutal-heading py-[10px] px-3 text-lg text-white/80">
-                  {user.username}
-                </span>
+                <span className="truncate px-3 font-brutal-heading text-lg text-white/80">{user.username}</span>
                 <button
                   type="button"
                   onClick={() => { closeMobile(); logout() }}
-                  className="font-brutal-heading inline-flex items-center py-[10px] px-3 text-lg text-red-400 hover:text-red-300 touch-manipulation text-left"
+                  className="nav-link-glitch font-brutal-heading mx-3 border border-border bg-white/[0.04] px-3 py-2.5 text-left text-lg text-red-400 touch-manipulation hover:text-red-300"
                 >
-                  Çıkış
+                  <span>Çıkış</span>
                 </button>
               </>
             ) : (
@@ -195,16 +231,16 @@ export function Header() {
                 <Link
                   to="/giris"
                   onClick={closeMobile}
-                  className="font-brutal-heading inline-flex items-center py-[10px] px-3 text-lg text-white/80 hover:text-white touch-manipulation text-left"
+                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 items-center justify-center bg-white/90 px-4 py-2.5 text-lg font-semibold text-black touch-manipulation hover:bg-white"
                 >
-                  Giriş Yap
+                  <span>Giriş Yap</span>
                 </Link>
                 <Link
                   to="/kayit"
                   onClick={closeMobile}
-                  className="font-brutal-heading inline-flex items-center py-[10px] px-3 text-lg text-[#facc15] hover:text-[#fde047] touch-manipulation text-left"
+                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 items-center justify-center border border-[#facc15]/40 bg-[#facc15]/10 px-4 py-2.5 text-lg text-[#facc15] touch-manipulation hover:text-[#fde047]"
                 >
-                  Kayıt Ol
+                  <span>Kayıt Ol</span>
                 </Link>
                 <button
                   type="button"
@@ -212,9 +248,9 @@ export function Header() {
                     closeMobile()
                     openDjPanel()
                   }}
-                  className="font-brutal-heading inline-flex items-center py-[10px] px-3 text-lg text-[#facc15] hover:text-[#fde047] transition-colors touch-manipulation text-left"
+                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 items-center px-3 py-2.5 text-lg text-white/60 touch-manipulation hover:text-white/90 text-left"
                 >
-                  DJ Girişi
+                  <span>DJ Girişi</span>
                 </button>
               </>
             )}
