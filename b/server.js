@@ -210,7 +210,7 @@ if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
 
 app.listen(PORT, () => {
   const base = `http://localhost:${PORT}`
-  console.log(`LFO Radio backend ${base}`)
+  console.log(`LOW Radio backend ${base}`)
   if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
     console.log("Frontend (production) bu porttan sunuluyor.")
   }

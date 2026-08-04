@@ -48,7 +48,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Alumni Sans Pinstripe", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Inter Tight", "Segoe UI", Arial, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -74,12 +74,12 @@
 }
 
 :root {
-  /* LfoRadio: görseldeki koyu gri (#111111 civarı) */
+  /* LowRadio: görseldeki koyu gri (#111111 civarı) */
   --radius: 0;
   --letter-spacing: var(--letter-spacing);
   --brutal-black: #000000;
   --brutal-white: #ffffff;
-  --background: #111111;
+  --background: #000000;
   --foreground: #e5e5e5;
   --card: #090909;
   --card-foreground: #f5f5f5;
@@ -99,10 +99,393 @@
   --ring: #f5f5f5;
 }
 
+/* Ana sayfa — editorial, siyah/beyaz LowRadio vitrini */
+.lfo-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  height: calc(100dvh - 104px);
+  min-height: 0;
+  flex: 1 1 auto;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  color: #f5f5f5;
+  font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
+}
+
+.lfo-hero-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto 1fr auto;
+  column-gap: clamp(12px, 1.5vw, 28px);
+  width: 100%;
+  min-height: 100%;
+  padding: clamp(24px, 3vw, 52px) clamp(24px, 3.2vw, 64px) 24px;
+}
+
+.lfo-hero-meta {
+  grid-column: 9 / -1;
+  grid-row: 3;
+  align-self: end;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  width: 100%;
+  margin: 0 0 clamp(68px, 8vh, 104px);
+  padding-left: clamp(18px, 2vw, 38px);
+  border-left: 1px solid #303030;
+  font-size: clamp(13px, .92vw, 18px);
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.lfo-hero-description,
+.lfo-hero-status {
+  margin: 0;
+  color: #c2c2c2;
+}
+
+.lfo-hero-status {
+  padding-top: 12px;
+  padding-left: 0;
+  border-top: 1px solid #303030;
+  border-left: 0;
+}
+
+.lfo-hero-monogram {
+  position: absolute;
+  z-index: -1;
+  right: clamp(12px, 1.8vw, 34px);
+  top: 9%;
+  color: #f4f4f4;
+  font-family: "Neue Haas Display", Arial, sans-serif;
+  font-size: clamp(340px, 33vw, 760px);
+  font-weight: 900;
+  line-height: .82;
+  letter-spacing: -.16em;
+  white-space: nowrap;
+  opacity: .98;
+  transform: scaleX(.76);
+  transform-origin: top right;
+  user-select: none;
+}
+
+.lfo-hero-bottom {
+  grid-column: 1 / span 7;
+  grid-row: 1 / 4;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  padding-top: clamp(10px, 1.5vh, 20px);
+  border-bottom: 1px solid #292929;
+  padding-bottom: clamp(22px, 3vh, 42px);
+}
+
+.lfo-hero-bottom > div {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+
+.lfo-hero-kicker {
+  margin: 10px 0 0;
+  color: #c7c7c7;
+  font-size: clamp(13px, .82vw, 16px);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lfo-home-player {
+  --home-art-size: 288px;
+  position: relative;
+  display: grid !important;
+  grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+  width: min(100%, 720px);
+  margin-top: clamp(28px, 6vh, 64px);
+  border: 1px solid #393939 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  height: 290px;
+  min-height: 290px;
+  max-height: 290px;
+  padding: 0 !important;
+}
+
+.lfo-home-player > div:first-of-type {
+  align-self: center;
+  aspect-ratio: 1 / 1;
+  width: 288px !important;
+  height: 288px !important;
+  min-height: 288px !important;
+  max-width: 288px !important;
+}
+
+.lfo-home-player .rounded-lg {
+  border: 1px solid #333;
+  border-radius: 0 !important;
+  background: #111 !important;
+}
+
+.lfo-home-player h3 {
+  position: absolute;
+  z-index: 3;
+  left: 1px;
+  bottom: 1px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: calc(var(--home-art-size) - 2px);
+  min-height: 48px;
+  margin: 0 !important;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, .72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  color: #d8d8d8 !important;
+  font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
+  font-size: 14px !important;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lfo-home-player h3::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: #ff3131;
+  box-shadow: 0 0 0 3px rgba(255, 49, 49, .12);
+}
+
+.lfo-home-player p,
+.lfo-home-player span {
+  color: #dedede;
+  font-weight: 500;
+}
+
+.lfo-home-player > div:last-child {
+  min-height: 0 !important;
+  padding: 10px 12px 10px 0 !important;
+}
+
+.lfo-home-player > div:last-child > div,
+.lfo-home-player > div:last-child > div > div {
+  min-height: 0 !important;
+}
+
+.lfo-home-player > div:last-child > div:first-child {
+  height: 100%;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+.lfo-home-player > div:last-child > div:first-child > div:first-child {
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: visible;
+}
+
+.lfo-home-player input[type="range"] {
+  height: 3px !important;
+  background: #484848 !important;
+}
+
+.lfo-home-player button {
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 0 !important;
+}
+
+.lfo-home-player button[aria-label="Oynat"],
+.lfo-home-player button[aria-label="Duraklat"] {
+  width: 72px !important;
+  height: 72px !important;
+  border: 1px solid #f4f4f4;
+  background: #f4f4f4 !important;
+}
+
+.lfo-home-player [class*="text-[10px]"],
+.lfo-home-player .text-xs {
+  font-size: 10px !important;
+}
+
+.lfo-home-player svg {
+  opacity: 1;
+}
+
+.lfo-home-player .text-white\/30 {
+  color: #8f8f8f !important;
+}
+
+.lfo-hero-bottom h1 {
+  max-width: 1080px;
+  margin: auto 0 0;
+  color: #f5f5f5;
+  font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(42px, 5.1vw, 98px);
+  font-weight: 300;
+  letter-spacing: -.055em;
+  line-height: .92;
+}
+
+@media (max-width: 900px) {
+  .lfo-hero-content {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: auto 1fr auto;
+  }
+  .lfo-hero-meta {
+    grid-column: 5 / -1;
+    grid-row: 2;
+    align-self: end;
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .lfo-hero-monogram {
+    top: 24%;
+    right: 18px;
+    font-size: clamp(280px, 66vw, 520px);
+    transform: scaleX(.72);
+    opacity: .92;
+  }
+  .lfo-hero-bottom {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .lfo-hero-bottom > div { width: min(88%, 720px); }
+  .lfo-hero-kicker { margin-top: 10px; }
+  .lfo-home-player h3 {
+    min-height: 28px;
+    padding: 7px 9px;
+    font-size: 9px !important;
+  }
+  .lfo-home-player button {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .lfo-home-player button[aria-label="Oynat"],
+  .lfo-home-player button[aria-label="Duraklat"] {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
+
+@media (max-height: 800px) and (min-width: 768px) {
+  .lfo-hero-content {
+    padding-top: 24px;
+    padding-bottom: 16px;
+  }
+  .lfo-hero-meta { margin-top: 0; }
+  .lfo-home-player {
+    --home-art-size: 116px;
+    grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+    width: min(100%, 500px);
+    margin-top: 18px;
+    height: 118px;
+    min-height: 118px;
+    max-height: 118px;
+    padding: 0 !important;
+  }
+  .lfo-home-player > div:first-of-type {
+    width: 116px !important;
+    height: 116px !important;
+    min-height: 116px !important;
+    max-width: 116px !important;
+  }
+  .lfo-home-player h3 {
+    min-height: 28px;
+    padding: 7px 9px;
+    font-size: 9px !important;
+  }
+  .lfo-home-player button {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .lfo-home-player button[aria-label="Oynat"],
+  .lfo-home-player button[aria-label="Duraklat"] {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .lfo-hero-kicker { margin-top: 8px; }
+  .lfo-hero-bottom {
+    padding-top: 18px;
+    padding-bottom: 16px;
+  }
+  .lfo-hero-bottom h1 { font-size: clamp(40px, 4.5vw, 76px); }
+}
+
+@media (max-width: 1023px) {
+  .lfo-hero { height: calc(100dvh - 100px); }
+}
+
+@media (max-width: 767px) {
+  .lfo-hero { height: calc(100dvh - 92px); }
+}
+
+@media (max-width: 639px) {
+  .lfo-hero { height: calc(100dvh - 84px); }
+}
+
+@media (max-width: 560px) {
+  .lfo-hero-content {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 20px 18px 14px;
+  }
+  .lfo-hero-meta { margin-top: 34px; font-size: 13px; }
+  .lfo-hero-description { max-width: 230px; }
+  .lfo-hero-meta {
+    grid-column: 3 / -1;
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 14px;
+  }
+  .lfo-hero-meta { padding-left: 12px; }
+  .lfo-hero-status { padding-left: 0; border-left: 0; }
+  .lfo-hero-bottom > div { width: 100%; }
+  .lfo-home-player {
+    --home-art-size: 108px;
+    grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+    height: 110px;
+    min-height: 110px;
+    max-height: 110px;
+    padding: 0 !important;
+  }
+  .lfo-home-player > div:first-of-type {
+    width: 108px !important;
+    height: 108px !important;
+    min-height: 108px !important;
+    max-width: 108px !important;
+  }
+  .lfo-home-player { margin-top: 0; }
+  .lfo-hero-monogram {
+    top: 34%;
+    right: 10px;
+    font-size: 76vw;
+    transform: scaleX(.68);
+  }
+  .lfo-hero-bottom h1 { font-size: clamp(40px, 13vw, 62px); }
+}
+
 @layer base {
   * {
     @apply outline-ring/50;
-    font-family: "Alumni Sans Pinstripe", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
     letter-spacing: var(--letter-spacing);
   }
   html {
@@ -125,17 +508,17 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
     overflow-x: hidden;
     @apply bg-background text-foreground antialiased;
-    font-family: "Alumni Sans Pinstripe", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
     letter-spacing: var(--letter-spacing);
   }
   .font-brutal-heading {
-    font-family: "Alumni Sans Pinstripe", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 400;
+    font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
+    font-weight: 500;
     letter-spacing: var(--letter-spacing);
   }
   .font-logo {
-    font-family: "Alumni Sans Pinstripe", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 400;
+    font-family: "Inter Tight", "Segoe UI", Arial, sans-serif;
+    font-weight: 500;
     letter-spacing: var(--letter-spacing);
   }
   /* Pinstripe yalnızca 400 — aktif parça orta vurgu (500↔700 arası) */
@@ -165,7 +548,7 @@
   .container {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
-  /* LfoRadio: sade, gölgesiz */
+  /* LowRadio: sade, gölgesiz */
   .shadow-brutal {
     box-shadow: none;
   }

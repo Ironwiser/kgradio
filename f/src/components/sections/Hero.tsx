@@ -1,19 +1,14 @@
 import { useEffect, useRef, useState } from "react"
-import { Link } from "react-router-dom"
+import { Player } from "@/components/player/Player"
 
 const heroConfig = {
-  title: "LfoRadio",
   subtitle: "No Algorithms · Pure Transmission",
-  ctaPrimary: { label: "Dinlemeye Başla", href: "/calma-listeleri" },
-  ctaSecondary: { label: "Hakkımızda", href: "/rasgele" },
 }
 
-const heroCtaBase =
-  "hero-cta-glitch font-brutal-heading inline-flex box-border items-center justify-center min-h-11 sm:h-[52px] px-4 sm:px-6 py-2.5 sm:py-[12px] text-base sm:text-xl md:text-2xl font-semibold text-black touch-manipulation max-w-[240px] sm:max-w-none rounded-none text-center leading-tight sm:whitespace-nowrap"
-
-const heroCtaClass = heroCtaBase
-
 const FALLBACK_VIDEO = "WhatsApp Video 2026-02-07 at 03.07.32.mp4"
+const HERO_BACKGROUND_VIDEO_ENABLED = false
+const LIVE_STREAM_URL =
+  "https://radio.lforadio.omurgenc.dev/listen/lfo_radio/radio.mp3"
 
 export function Hero() {
   const [videoList, setVideoList] = useState<string[]>([])
@@ -21,6 +16,8 @@ export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
+    if (!HERO_BACKGROUND_VIDEO_ENABLED) return
+
     fetch("/api/animasyon/list")
       .then((r) => r.json())
       .then((data: { files?: string[] }) => {
@@ -32,6 +29,8 @@ export function Hero() {
   }, [])
 
   useEffect(() => {
+    if (!HERO_BACKGROUND_VIDEO_ENABLED) return
+
     if (videoList.length === 0 || !videoRef.current) return
     const name = videoList[currentIndex % videoList.length]
     const src = "/animasyon/" + encodeURIComponent(name)
@@ -51,40 +50,45 @@ export function Hero() {
 
   return (
     <section
-      className="relative z-0 flex min-h-0 w-full min-w-0 flex-1 items-center overflow-hidden box-border"
+      className="lfo-hero"
       aria-label="Ana içerik"
     >
       {/* Arka plan videoları – sırayla oynar */}
-      <div className="absolute inset-0 z-0 min-h-full">
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          preload="metadata"
-          className="absolute inset-0 h-full w-full object-cover"
-          aria-hidden
-          onEnded={goNext}
-        />
-        <div className="absolute inset-0 bg-black/50" aria-hidden />
-      </div>
+      {HERO_BACKGROUND_VIDEO_ENABLED && (
+        <div className="absolute inset-0 z-0 min-h-full">
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover"
+            aria-hidden
+            onEnded={goNext}
+          />
+          <div className="absolute inset-0 bg-black/50" aria-hidden />
+        </div>
+      )}
 
-      <div className="relative z-10 w-full min-w-0 px-3 pb-4 pt-2 sm:px-4 sm:pb-6 md:px-6 box-border">
-        {/* Ortadaki blok – sade logo + slogan */}
-        <div className="mx-auto w-full max-w-3xl min-w-0 text-center">
-          <h1 className="font-logo text-5xl sm:text-6xl lg:text-7xl font-medium text-white">
-            {heroConfig.title}
-          </h1>
-          <p className="mt-5 sm:mt-6 text-lg sm:text-2xl md:text-3xl font-medium text-neutral-400">
-            {heroConfig.subtitle}
+      <div className="lfo-hero-content">
+        <div className="lfo-hero-meta">
+          <p className="lfo-hero-description">
+            Bağımsız sesleri, seçkileri ve canlı yayınları algoritmalardan uzak,
+            özgür bir frekansta bir araya getiriyoruz.
           </p>
-          {/* CTA – masaüstünde elegant, mobilde dar/kompakt (max genişlik + gerekirse 2 satır) */}
-          <div className="mt-8 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center max-w-full">
-            <Link to={heroConfig.ctaPrimary.href} className={heroCtaClass}>
-              <span>{heroConfig.ctaPrimary.label}</span>
-            </Link>
-            <Link to={heroConfig.ctaSecondary.href} className={heroCtaClass}>
-              <span>{heroConfig.ctaSecondary.label}</span>
-            </Link>
+          <p className="lfo-hero-status">Dünya çapında<br />7/24 yayında</p>
+        </div>
+
+        <div className="lfo-hero-monogram" aria-hidden="true">LOW</div>
+
+        <div className="lfo-hero-bottom">
+          <div>
+            <Player
+              src={LIVE_STREAM_URL}
+              title="LowRadio Canlı"
+              className="lfo-home-player"
+            />
+            <p className="lfo-hero-kicker">{heroConfig.subtitle}</p>
+            <h1>Sesin peşindeyiz.<br />Frekansımız herkese açık.</h1>
           </div>
         </div>
       </div>

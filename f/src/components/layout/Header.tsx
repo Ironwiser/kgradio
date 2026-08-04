@@ -8,7 +8,6 @@ const navLinks = [
   { to: "/canli", label: "Canlı Yayın" },
   { to: "/calma-listeleri", label: "Çalma Listeleri" },
   { to: "/hakkimizda", label: "Hakkımızda" },
-  { to: "/canli", label: "Dinle" },
 ]
 
 export function Header() {
@@ -37,24 +36,24 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-[#111111] overflow-visible">
-      <div className="w-full px-4">
-        <div className="flex h-[52px] items-center justify-between mx-auto max-w-3xl min-w-0 overflow-visible">
+    <header className="sticky top-0 z-50 w-full border-b border-[#1f1f1f] bg-black overflow-visible">
+      <div className="w-full px-4 lg:px-[32px]">
+        <div className="mx-auto flex h-[52px] w-full max-w-[1600px] min-w-0 items-center justify-between overflow-visible lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]">
         {/* Sol alan – marka; lg’de sağ ile aynı genişlik (w-44) */}
         <Link
           to="/"
-          className="logo-link-glitch flex items-center gap-1.5 sm:gap-2 pr-2 sm:pr-3 md:pr-4 h-full shrink-0 min-w-0"
+          className="logo-link-glitch flex items-center gap-1.5 sm:gap-2 lg:gap-1 pr-2 sm:pr-3 md:pr-4 lg:pr-2 h-full shrink-0 min-w-0 lg:justify-self-start"
           onClick={closeMobile}
         >
-          <span className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center bg-[#d9d9d9]">
-            <Radio className="h-3 w-3 sm:h-4 sm:w-4 text-black" aria-hidden />
+          <span className="flex h-6 w-6 sm:h-7 sm:w-7 lg:h-[26px] lg:w-[26px] shrink-0 items-center justify-center bg-[#d9d9d9]">
+            <Radio className="h-3 w-3 sm:h-4 sm:w-4 lg:h-[14px] lg:w-[14px] text-black" aria-hidden />
           </span>
-          <span className="font-logo text-lg sm:text-xl md:text-xl lg:text-2xl text-white truncate">
-            LfoRadio
+          <span className="font-logo text-lg sm:text-xl md:text-xl lg:text-[0.55rem] text-white truncate">
+            LowRadio
           </span>
         </Link>
 
-        <nav className="hidden lg:flex h-full flex-1 items-center justify-center gap-2 xl:gap-4 min-w-0">
+        <nav className="hidden lg:flex h-full min-w-0 items-center justify-center gap-[56px] xl:gap-[76px]">
           {navLinks.map(({ to, label }) => {
             const isActive = location.pathname.startsWith(to)
             return (
@@ -63,7 +62,7 @@ export function Header() {
                 to={to}
                 className={cn(
                   "nav-link-glitch font-brutal-heading flex h-full min-h-0 items-center justify-center transition-colors shrink-0",
-                  "lg:text-base lg:px-2 xl:text-lg xl:px-3 2xl:text-xl 2xl:px-4",
+                  "lg:text-[0.41rem] lg:px-1 xl:text-[0.46rem] xl:px-1.5 2xl:text-[0.5rem] 2xl:px-2",
                   isActive ? "text-white" : "text-white/70 hover:text-white"
                 )}
               >
@@ -73,7 +72,7 @@ export function Header() {
           })}
         </nav>
 
-        <div className="relative flex h-full items-center gap-0.5 lg:gap-1 shrink-0" ref={rightDropdownRef}>
+        <div className="relative flex h-full shrink-0 items-center gap-0.5 lg:gap-1 lg:justify-self-end" ref={rightDropdownRef}>
           {/* Masaüstü: giriş / hesap tetikleyicisi */}
           <button
             type="button"
@@ -81,8 +80,8 @@ export function Header() {
             className={cn(
               "nav-link-glitch hidden lg:inline-flex font-brutal-heading",
               "h-full min-h-0 max-w-[10rem] items-center justify-center gap-1.5 shrink-0 leading-none",
-              "bg-white/[0.04] px-2 xl:px-3 2xl:px-4",
-              "lg:text-base xl:text-lg 2xl:text-xl text-white/85 transition-colors touch-manipulation",
+              "bg-white/[0.04] px-1 xl:px-1.5 2xl:px-2",
+              "lg:text-[0.41rem] xl:text-[0.46rem] 2xl:text-[0.5rem] text-white/85 transition-colors touch-manipulation",
               "hover:text-white",
               rightDropdownOpen && "bg-white/[0.08] text-white"
             )}
@@ -193,7 +192,7 @@ export function Header() {
           "lg:hidden absolute left-0 right-0 top-full backdrop-blur-sm transition-[max-height] duration-200 ease-out",
           mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0 overflow-hidden"
         )}
-        style={{ background: "rgba(17, 17, 17, 0.95)" }}
+        style={{ background: "rgba(0, 0, 0, 0.96)" }}
         aria-hidden={!mobileOpen}
       >
         <nav className="flex flex-col px-4 py-4 gap-2 pb-6">
