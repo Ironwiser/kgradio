@@ -281,7 +281,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         >
           <div className="min-w-0">
             {title && (
-              <h3 className="mb-0 text-[9px] sm:text-[10px] md:text-xs font-medium uppercase tracking-wider text-white/50">
+              <h3 className="mb-0 text-[9px] sm:text-[10px] md:text-xs font-medium tracking-wider text-white/50">
                 {title}
               </h3>
             )}

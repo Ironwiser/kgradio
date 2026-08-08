@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { Player } from "@/components/player/Player"
 
 const heroConfig = {
-  subtitle: "No Algorithms · Pure Transmission",
+  subtitle: "NO ALGORITHMS · PURE TRANSMISSION",
 }
 
 const FALLBACK_VIDEO = "WhatsApp Video 2026-02-07 at 03.07.32.mp4"
@@ -69,26 +69,40 @@ export function Hero() {
         </div>
       )}
 
-      <div className="lfo-hero-content">
-        <div className="lfo-hero-meta">
-          <p className="lfo-hero-description">
-            Bağımsız sesleri, seçkileri ve canlı yayınları algoritmalardan uzak,
-            özgür bir frekansta bir araya getiriyoruz.
-          </p>
-          <p className="lfo-hero-status">Dünya çapında<br />7/24 yayında</p>
+      <div className="low-home-v2-shell">
+        <div className="low-home-v2-topline">
+          <p>INDEPENDENT RADIO</p>
+          <p><span aria-hidden /> WORLDWIDE · 24/7</p>
         </div>
 
-        <div className="lfo-hero-monogram" aria-hidden="true">LOW</div>
+        <div className="low-home-v2-mobile-content">
+          <div className="low-home-v2-stage">
+            <div className="low-home-v2-broadcast">
+              <p className="low-home-v2-section-label">LIVE TRANSMISSION</p>
+              <Player
+                src={LIVE_STREAM_URL}
+                title="LOWRadio Canlı"
+                className="low-home-v2-player"
+              />
+              <div className="low-home-v2-copy">
+                <p>Bağımsız sesleri, seçkileri ve canlı yayınları algoritmalardan uzak bir araya getiriyoruz.</p>
+                <p>{heroConfig.subtitle}</p>
+              </div>
+            </div>
 
-        <div className="lfo-hero-bottom">
-          <div>
-            <Player
-              src={LIVE_STREAM_URL}
-              title="LowRadio Canlı"
-              className="lfo-home-player"
-            />
-            <p className="lfo-hero-kicker">{heroConfig.subtitle}</p>
-            <h1>Sesin peşindeyiz.<br />Frekansımız herkese açık.</h1>
+            <div className="low-home-v2-mark" aria-label="LOWRadio">
+              <img className="low-home-v2-mark-logo" src="/images/low-logo.png" alt="LOWRadio" />
+              <strong aria-hidden>LOW</strong>
+              <span aria-hidden>Radio</span>
+            </div>
+          </div>
+
+          <div className="low-home-v2-manifesto">
+            <p>OPEN FREQUENCY / CURATED SOUND</p>
+            <h1>
+              <span>Sesin peşindeyiz.</span>
+              <span>Frekansımız herkese açık.</span>
+            </h1>
           </div>
         </div>
       </div>

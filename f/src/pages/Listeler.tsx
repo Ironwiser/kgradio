@@ -61,11 +61,11 @@ export function Listeler() {
     >
       <div className="container relative z-10 mx-auto flex max-w-3xl min-w-0 flex-col items-stretch px-0">
         <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
-          LowRadio · Çalma Listeleri
+          LOWRadio · Çalma Listeleri
         </h1>
         <Player
           src={playerSrc}
-          title="LowRadio"
+          title="LOWRadio"
           trackName={playerTrackName}
           artworkUrl={playerArtworkUrl}
           trackInfoUrl={selectedTrack ? undefined : "/api/audio/current"}

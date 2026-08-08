@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Radio, Menu, X, UserRound, LogIn, UserPlus, ExternalLink, LogOut } from "lucide-react"
+import { Menu, X, LogIn, UserPlus, ExternalLink, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 
@@ -36,24 +36,20 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#1f1f1f] bg-black overflow-visible">
-      <div className="w-full px-4 lg:px-[32px]">
-        <div className="mx-auto flex h-[52px] w-full max-w-[1600px] min-w-0 items-center justify-between overflow-visible lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]">
+    <header className="low-site-header sticky top-0 z-50 w-full border-b border-[#1f1f1f] bg-black overflow-visible">
+      <div className="low-site-header-frame w-full px-4 lg:px-[32px]">
+        <div className="low-site-header-grid mx-auto flex h-[52px] w-full max-w-[1600px] min-w-0 items-center justify-between overflow-visible lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]">
         {/* Sol alan – marka; lg’de sağ ile aynı genişlik (w-44) */}
         <Link
           to="/"
-          className="logo-link-glitch flex items-center gap-1.5 sm:gap-2 lg:gap-1 pr-2 sm:pr-3 md:pr-4 lg:pr-2 h-full shrink-0 min-w-0 lg:justify-self-start"
+          className="low-site-brand logo-link-glitch flex items-center gap-1.5 sm:gap-2 lg:gap-1 pr-2 sm:pr-3 md:pr-4 lg:pr-2 h-full shrink-0 min-w-0 lg:justify-self-start"
           onClick={closeMobile}
         >
-          <span className="flex h-6 w-6 sm:h-7 sm:w-7 lg:h-[26px] lg:w-[26px] shrink-0 items-center justify-center bg-[#d9d9d9]">
-            <Radio className="h-3 w-3 sm:h-4 sm:w-4 lg:h-[14px] lg:w-[14px] text-black" aria-hidden />
-          </span>
-          <span className="font-logo text-lg sm:text-xl md:text-xl lg:text-[0.55rem] text-white truncate">
-            LowRadio
-          </span>
+          <img className="low-site-brand-logo" src="/images/low-logo.png" alt="LOWRadio" />
+          <span className="low-site-brand-radio">Radio</span>
         </Link>
 
-        <nav className="hidden lg:flex h-full min-w-0 items-center justify-center gap-[56px] xl:gap-[76px]">
+        <nav className="low-site-nav hidden lg:flex h-full min-w-0 items-center justify-center gap-[56px] xl:gap-[76px]">
           {navLinks.map(({ to, label }) => {
             const isActive = location.pathname.startsWith(to)
             return (
@@ -61,9 +57,9 @@ export function Header() {
                 key={label}
                 to={to}
                 className={cn(
-                  "nav-link-glitch font-brutal-heading flex h-full min-h-0 items-center justify-center transition-colors shrink-0",
+                  "low-site-nav-link nav-link-glitch font-brutal-heading flex h-full min-h-0 items-center justify-center transition-colors shrink-0",
                   "lg:text-[0.41rem] lg:px-1 xl:text-[0.46rem] xl:px-1.5 2xl:text-[0.5rem] 2xl:px-2",
-                  isActive ? "text-white" : "text-white/70 hover:text-white"
+                  isActive ? "low-site-nav-link-active text-white" : "text-white/70 hover:text-white"
                 )}
               >
                 <span>{label}</span>
@@ -78,7 +74,7 @@ export function Header() {
             type="button"
             onClick={() => setRightDropdownOpen((o) => !o)}
             className={cn(
-              "nav-link-glitch hidden lg:inline-flex font-brutal-heading",
+              "low-site-account nav-link-glitch hidden lg:inline-flex font-brutal-heading",
               "h-full min-h-0 max-w-[10rem] items-center justify-center gap-1.5 shrink-0 leading-none",
               "bg-white/[0.04] px-1 xl:px-1.5 2xl:px-2",
               "lg:text-[0.41rem] xl:text-[0.46rem] 2xl:text-[0.5rem] text-white/85 transition-colors touch-manipulation",
@@ -92,9 +88,7 @@ export function Header() {
               <span className="font-brutal-heading shrink-0 leading-none" aria-hidden>
                 {user.username.charAt(0).toUpperCase()}
               </span>
-            ) : (
-              <UserRound className="auth-trigger-icon" strokeWidth={1} aria-hidden />
-            )}
+            ) : null}
             <span className="truncate">{user ? user.username : "Giriş"}</span>
           </button>
 
@@ -176,11 +170,11 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-white lg:hidden touch-manipulation"
+            className="low-site-menu-trigger flex h-8 w-8 md:h-[32px] md:w-[32px] shrink-0 items-center justify-center rounded text-white lg:hidden touch-manipulation"
             aria-expanded={mobileOpen}
             aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
           >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileOpen ? <X className="h-5 w-5 md:h-[20px] md:w-[20px]" /> : <Menu className="h-5 w-5 md:h-[20px] md:w-[20px]" />}
           </button>
         </div>
       </div>
@@ -189,20 +183,20 @@ export function Header() {
       {/* Mobil menü: overlay (içeriği itmez), lg altında, transparan arka plan */}
       <div
         className={cn(
-          "lg:hidden absolute left-0 right-0 top-full backdrop-blur-sm transition-[max-height] duration-200 ease-out",
+          "low-site-mobile-menu lg:hidden absolute left-0 right-0 top-full backdrop-blur-sm transition-[max-height] duration-200 ease-out",
           mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0 overflow-hidden"
         )}
         style={{ background: "rgba(0, 0, 0, 0.96)" }}
         aria-hidden={!mobileOpen}
       >
-        <nav className="flex flex-col px-4 py-4 gap-2 pb-6">
+        <nav className="flex flex-col px-4 py-4 md:px-[16px] md:py-[16px] gap-2 md:gap-[8px] pb-6 md:pb-[24px]">
           {navLinks.map(({ to, label }) => (
             <Link
               key={label}
               to={to}
               onClick={closeMobile}
               className={cn(
-                "nav-link-glitch font-brutal-heading py-[10px] px-3 text-xl capitalize transition-colors touch-manipulation",
+                "nav-link-glitch font-brutal-heading py-[10px] px-3 text-xl md:text-[20px] capitalize transition-colors touch-manipulation",
                 location.pathname === to ? "text-white" : "text-white/70 hover:text-white"
               )}
             >
@@ -211,16 +205,16 @@ export function Header() {
           ))}
 
           <div className="mt-4 border-t border-border pt-4 flex flex-col gap-2 items-stretch">
-            <p className="px-3 font-brutal-heading text-xs uppercase tracking-wider text-white/45">
+            <p className="px-3 font-brutal-heading text-xs md:text-[12px] uppercase tracking-wider text-white/45">
               {user ? "Hesap" : "Üyelik"}
             </p>
             {user ? (
               <>
-                <span className="truncate px-3 font-brutal-heading text-lg text-white/80">{user.username}</span>
+                <span className="truncate px-3 font-brutal-heading text-lg md:text-[18px] text-white/80">{user.username}</span>
                 <button
                   type="button"
                   onClick={() => { closeMobile(); logout() }}
-                  className="nav-link-glitch font-brutal-heading mx-3 border border-border bg-white/[0.04] px-3 py-2.5 text-left text-lg text-red-400 touch-manipulation hover:text-red-300"
+                  className="nav-link-glitch font-brutal-heading mx-3 border border-border bg-white/[0.04] px-3 py-2.5 text-left text-lg md:text-[18px] text-red-400 touch-manipulation hover:text-red-300"
                 >
                   <span>Çıkış</span>
                 </button>
@@ -230,14 +224,14 @@ export function Header() {
                 <Link
                   to="/giris"
                   onClick={closeMobile}
-                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 items-center justify-center bg-white/90 px-4 py-2.5 text-lg font-semibold text-black touch-manipulation hover:bg-white"
+                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center justify-center bg-white/90 px-4 md:px-[16px] py-2.5 md:py-[10px] text-lg md:text-[18px] font-semibold text-black touch-manipulation hover:bg-white"
                 >
                   <span>Giriş Yap</span>
                 </Link>
                 <Link
                   to="/kayit"
                   onClick={closeMobile}
-                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 items-center justify-center border border-[#facc15]/40 bg-[#facc15]/10 px-4 py-2.5 text-lg text-[#facc15] touch-manipulation hover:text-[#fde047]"
+                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center justify-center border border-[#facc15]/40 bg-[#facc15]/10 px-4 md:px-[16px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-[#facc15] touch-manipulation hover:text-[#fde047]"
                 >
                   <span>Kayıt Ol</span>
                 </Link>
@@ -247,7 +241,7 @@ export function Header() {
                     closeMobile()
                     openDjPanel()
                   }}
-                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 items-center px-3 py-2.5 text-lg text-white/60 touch-manipulation hover:text-white/90 text-left"
+                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center px-3 md:px-[12px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-white/60 touch-manipulation hover:text-white/90 text-left"
                 >
                   <span>DJ Girişi</span>
                 </button>

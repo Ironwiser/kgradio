@@ -74,7 +74,7 @@
 }
 
 :root {
-  /* LowRadio: görseldeki koyu gri (#111111 civarı) */
+  /* LOWRadio: görseldeki koyu gri (#111111 civarı) */
   --radius: 0;
   --letter-spacing: var(--letter-spacing);
   --brutal-black: #000000;
@@ -99,7 +99,7 @@
   --ring: #f5f5f5;
 }
 
-/* Ana sayfa — editorial, siyah/beyaz LowRadio vitrini */
+/* Ana sayfa — editorial, siyah/beyaz LOWRadio vitrini */
 .lfo-hero {
   position: relative;
   isolation: isolate;
@@ -127,16 +127,16 @@
 }
 
 .lfo-hero-meta {
-  grid-column: 9 / -1;
-  grid-row: 3;
-  align-self: end;
+  grid-column: 1 / span 6;
+  grid-row: 1;
+  align-self: start;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  width: 100%;
-  margin: 0 0 clamp(68px, 8vh, 104px);
-  padding-left: clamp(18px, 2vw, 38px);
-  border-left: 1px solid #303030;
+  grid-template-columns: minmax(0, 1.5fr) minmax(140px, .65fr);
+  gap: clamp(24px, 3vw, 54px);
+  width: min(100%, 760px);
+  margin: 0;
+  padding: 0;
+  border-left: 0;
   font-size: clamp(13px, .92vw, 18px);
   line-height: 1.35;
   font-weight: 500;
@@ -148,11 +148,28 @@
   color: #c2c2c2;
 }
 
+.lfo-hero-radio-label {
+  position: absolute;
+  z-index: 1;
+  top: 60%;
+  right: clamp(12px, 1.8vw, 34px);
+  margin: 0;
+  color: #f4f4f4;
+  font-family: "Neue Haas Display", "Inter Tight", sans-serif;
+  font-size: clamp(42px, 8.25vw, 150px);
+  font-weight: 900;
+  line-height: .8;
+  letter-spacing: -.07em;
+  text-align: right;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .lfo-hero-status {
-  padding-top: 12px;
-  padding-left: 0;
-  border-top: 1px solid #303030;
-  border-left: 0;
+  padding-top: 0;
+  padding-left: clamp(14px, 1.4vw, 24px);
+  border-top: 0;
+  border-left: 1px solid #303030;
 }
 
 .lfo-hero-monogram {
@@ -202,7 +219,7 @@
 }
 
 .lfo-home-player {
-  --home-art-size: 288px;
+  --home-art-size: 190px;
   position: relative;
   display: grid !important;
   grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
@@ -213,19 +230,19 @@
   border: 1px solid #393939 !important;
   border-radius: 0 !important;
   background: transparent !important;
-  height: 290px;
-  min-height: 290px;
-  max-height: 290px;
+  height: 192px;
+  min-height: 192px;
+  max-height: 192px;
   padding: 0 !important;
 }
 
 .lfo-home-player > div:first-of-type {
   align-self: center;
   aspect-ratio: 1 / 1;
-  width: 288px !important;
-  height: 288px !important;
-  min-height: 288px !important;
-  max-width: 288px !important;
+  width: 190px !important;
+  height: 190px !important;
+  min-height: 190px !important;
+  max-width: 190px !important;
 }
 
 .lfo-home-player .rounded-lg {
@@ -277,7 +294,7 @@
 
 .lfo-home-player > div:last-child {
   min-height: 0 !important;
-  padding: 10px 12px 10px 0 !important;
+  padding: 18px 14px 18px 0 !important;
 }
 
 .lfo-home-player > div:last-child > div,
@@ -287,14 +304,18 @@
 
 .lfo-home-player > div:last-child > div:first-child {
   height: 100%;
-  justify-content: center !important;
-  gap: 10px !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
 }
 
 .lfo-home-player > div:last-child > div:first-child > div:first-child {
+  display: contents;
   height: 0 !important;
   min-height: 0 !important;
-  overflow: visible;
+}
+
+.lfo-home-player > div:last-child > div:first-child > div:last-child {
+  flex: 0 0 auto !important;
 }
 
 .lfo-home-player input[type="range"] {
@@ -305,7 +326,7 @@
 .lfo-home-player button {
   width: 60px !important;
   height: 60px !important;
-  border-radius: 0 !important;
+  border-radius: 9999px !important;
 }
 
 .lfo-home-player button[aria-label="Oynat"],
@@ -340,24 +361,148 @@
   line-height: .92;
 }
 
+@media (min-width: 901px) {
+  .lfo-hero-monogram {
+    transform: translateY(13px) scaleX(.76);
+  }
+  .lfo-hero-meta {
+    transform: translateY(90px);
+  }
+  .lfo-hero-bottom {
+    grid-column: 1 / -1;
+  }
+  .lfo-hero-bottom > div {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto minmax(20px, 1fr) auto;
+    column-gap: clamp(12px, 1.5vw, 28px);
+  }
+  .lfo-home-player {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
+  .lfo-hero-kicker {
+    grid-column: 1 / span 5;
+    grid-row: 2;
+  }
+  .lfo-hero-bottom h1 {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    align-self: end;
+    max-width: none;
+    margin: 0;
+    font-size: clamp(36px, 4.1vw, 79px);
+    line-height: .9;
+    white-space: nowrap;
+  }
+  .lfo-hero-radio-label {
+    position: static;
+    grid-column: 10 / -1;
+    grid-row: 4;
+    align-self: end;
+    justify-self: end;
+    margin: 0;
+    font-size: clamp(36px, 4.1vw, 79px);
+    line-height: .9;
+    transform: translateY(13px) scale(1.65);
+    transform-origin: bottom right;
+  }
+}
+
+@media (min-width: 1280px) {
+  .lfo-hero-monogram {
+    top: 26%;
+    font-size: clamp(290px, 27vw, 610px);
+  }
+  .lfo-hero-bottom h1 {
+    font-size: clamp(40px, 4.1vw, 79px);
+  }
+  .lfo-hero-kicker {
+    font-size: clamp(11px, .66vw, 13px);
+  }
+  .lfo-hero-radio-label {
+    font-size: clamp(40px, 4.1vw, 79px);
+  }
+  .lfo-home-player {
+    margin-top: clamp(148px, 19vh, 182px);
+  }
+}
+
+@media (max-width: 1279px) and (min-width: 901px) {
+  .lfo-hero-content {
+    padding: 28px 36px 20px;
+  }
+  .lfo-home-player {
+    --home-art-size: 208px;
+    grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+    width: min(100%, 560px);
+    height: 210px;
+    min-height: 210px;
+    max-height: 210px;
+    margin-top: clamp(138px, 17vh, 162px);
+  }
+  .lfo-home-player > div:first-of-type {
+    width: 208px !important;
+    height: 208px !important;
+    min-height: 208px !important;
+    max-width: 208px !important;
+  }
+  .lfo-home-player h3 {
+    min-height: 36px;
+    padding: 9px 12px;
+    font-size: 11px !important;
+  }
+  .lfo-home-player button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .lfo-home-player button[aria-label="Oynat"],
+  .lfo-home-player button[aria-label="Duraklat"] {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .lfo-hero-monogram {
+    top: 40%;
+    right: 20px;
+    font-size: clamp(330px, 40vw, 500px);
+  }
+  .lfo-hero-meta {
+    margin-bottom: 52px;
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 900px) {
   .lfo-hero-content {
     grid-template-columns: repeat(8, minmax(0, 1fr));
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto minmax(120px, 1fr) auto;
+    padding: 24px 24px 18px;
   }
   .lfo-hero-meta {
-    grid-column: 5 / -1;
-    grid-row: 2;
-    align-self: end;
-    grid-template-columns: 1fr;
-    width: 100%;
-    gap: 10px;
-    margin-bottom: 20px;
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    align-self: start;
+    grid-template-columns: minmax(0, 1.4fr) minmax(110px, .7fr);
+    width: min(100%, 540px);
+    gap: 18px;
+    margin: 0;
+    padding-left: 0;
+    border-left: 0;
+    font-size: 12px;
+  }
+  .lfo-hero-status {
+    padding-top: 0;
+    padding-left: 14px;
+    border-top: 0;
+    border-left: 1px solid #303030;
+  }
+  .lfo-hero-radio-label {
+    display: none;
   }
   .lfo-hero-monogram {
-    top: 24%;
+    top: 16%;
     right: 18px;
-    font-size: clamp(280px, 66vw, 520px);
+    font-size: clamp(250px, 58vw, 480px);
     transform: scaleX(.72);
     opacity: .92;
   }
@@ -367,8 +512,30 @@
     grid-template-columns: 1fr;
     gap: 28px;
   }
-  .lfo-hero-bottom > div { width: min(88%, 720px); }
+  .lfo-hero-bottom > div {
+    display: flex;
+    width: min(88%, 720px);
+    flex-direction: column;
+  }
   .lfo-hero-kicker { margin-top: 10px; }
+  .lfo-home-player {
+    --home-art-size: 160px;
+    grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+    width: min(100%, 580px);
+    height: 162px;
+    min-height: 162px;
+    max-height: 162px;
+    margin-top: 16px;
+  }
+  .lfo-home-player > div:first-of-type {
+    width: 160px !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    max-width: 160px !important;
+  }
+  .lfo-home-player > div:last-child {
+    padding: 8px 10px 8px 0 !important;
+  }
   .lfo-home-player h3 {
     min-height: 28px;
     padding: 7px 9px;
@@ -407,6 +574,9 @@
     min-height: 116px !important;
     max-width: 116px !important;
   }
+  .lfo-home-player > div:last-child {
+    padding: 8px 10px 8px 0 !important;
+  }
   .lfo-home-player h3 {
     min-height: 28px;
     padding: 7px 9px;
@@ -429,6 +599,10 @@
   .lfo-hero-bottom h1 { font-size: clamp(40px, 4.5vw, 76px); }
 }
 
+@media (max-height: 800px) and (min-width: 901px) {
+  .lfo-home-player { margin-top: 138px; }
+}
+
 @media (max-width: 1023px) {
   .lfo-hero { height: calc(100dvh - 100px); }
 }
@@ -444,19 +618,37 @@
 @media (max-width: 560px) {
   .lfo-hero-content {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding: 20px 18px 14px;
+    grid-template-rows: auto minmax(150px, 1fr) auto;
+    padding: 16px 14px 12px;
   }
-  .lfo-hero-meta { margin-top: 34px; font-size: 13px; }
-  .lfo-hero-description { max-width: 230px; }
   .lfo-hero-meta {
-    grid-column: 3 / -1;
-    grid-row: 2;
-    grid-template-columns: 1fr;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: start;
+    grid-template-columns: minmax(0, 1.35fr) minmax(90px, .65fr);
     width: 100%;
-    gap: 14px;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 10px;
+    line-height: 1.3;
   }
-  .lfo-hero-meta { padding-left: 12px; }
-  .lfo-hero-status { padding-left: 0; border-left: 0; }
+  .lfo-hero-description { max-width: none; }
+  .lfo-hero-status {
+    padding: 0 0 0 10px;
+    border-top: 0;
+    border-left: 1px solid #303030;
+  }
+  .lfo-hero-radio-label {
+    display: none;
+  }
+  .lfo-hero-bottom {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    padding-top: 0;
+    padding-bottom: 10px;
+  }
   .lfo-hero-bottom > div { width: 100%; }
   .lfo-home-player {
     --home-art-size: 108px;
@@ -474,12 +666,713 @@
   }
   .lfo-home-player { margin-top: 0; }
   .lfo-hero-monogram {
-    top: 34%;
-    right: 10px;
-    font-size: 76vw;
-    transform: scaleX(.68);
+    top: 20%;
+    right: auto;
+    left: 50%;
+    font-size: 58vw;
+    transform: translateX(-50%) scaleX(.68);
+    transform-origin: top center;
   }
-  .lfo-hero-bottom h1 { font-size: clamp(40px, 13vw, 62px); }
+  .lfo-hero-kicker { margin-top: 8px; font-size: 11px; }
+  .lfo-hero-bottom h1 {
+    margin-top: 8px;
+    font-size: clamp(34px, 10.8vw, 52px);
+    line-height: .96;
+  }
+}
+
+@media (max-width: 380px) {
+  .lfo-hero-content { padding: 16px 14px 12px; }
+  .lfo-hero-meta {
+    font-size: 11px;
+    gap: 9px;
+    padding-left: 8px;
+  }
+  .lfo-home-player {
+    --home-art-size: 92px;
+    grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+    height: 94px;
+    min-height: 94px;
+    max-height: 94px;
+    gap: 8px !important;
+  }
+  .lfo-home-player > div:first-of-type {
+    width: 92px !important;
+    height: 92px !important;
+    min-height: 92px !important;
+    max-width: 92px !important;
+  }
+  .lfo-home-player > div:last-child { padding-right: 8px !important; }
+  .lfo-home-player h3 {
+    min-height: 24px;
+    padding: 5px 6px;
+    font-size: 8px !important;
+  }
+  .lfo-home-player button { width: 28px !important; height: 28px !important; }
+  .lfo-home-player button[aria-label="Oynat"],
+  .lfo-home-player button[aria-label="Duraklat"] {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  .lfo-hero-kicker { font-size: 11px; }
+  .lfo-hero-bottom h1 { font-size: 11.5vw; line-height: .96; }
+}
+
+@media (max-height: 560px) and (min-width: 568px) and (max-width: 900px) {
+  .lfo-hero-content {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: 1fr;
+    padding: 12px 20px 10px;
+  }
+  .lfo-hero-bottom {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+    padding: 0 0 10px;
+  }
+  .lfo-hero-bottom > div { width: 100%; }
+  .lfo-home-player {
+    --home-art-size: 88px;
+    grid-template-columns: var(--home-art-size) minmax(0, 1fr) !important;
+    width: min(100%, 430px);
+    height: 90px;
+    min-height: 90px;
+    max-height: 90px;
+    margin-top: 0;
+  }
+  .lfo-home-player > div:first-of-type {
+    width: 88px !important;
+    height: 88px !important;
+    min-height: 88px !important;
+    max-width: 88px !important;
+  }
+  .lfo-hero-kicker { margin-top: 6px; font-size: 10px; }
+  .lfo-hero-bottom h1 { font-size: clamp(30px, 5vw, 42px); }
+  .lfo-hero-monogram {
+    top: 4%;
+    right: 10px;
+    font-size: 38vw;
+  }
+  .lfo-hero-meta {
+    grid-column: 6 / -1;
+    grid-row: 1;
+    align-self: end;
+    margin: 0 0 14px;
+    padding-left: 10px;
+    font-size: 10px;
+  }
+}
+
+/* Ana sayfa v2 — geri alınabilir editorial yayın sahnesi */
+.low-home-v2-shell {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(14px, 2vh, 24px);
+  width: 100%;
+  height: 100%;
+  padding: clamp(22px, 2.6vw, 44px) clamp(24px, 3.2vw, 64px) clamp(18px, 2vw, 30px);
+  overflow: hidden;
+  color: #f4f4f4;
+  font-family: "Inter Tight", "Segoe UI", sans-serif;
+}
+
+.low-home-v2-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #292929;
+  color: #a9a9a9;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.low-home-v2-mobile-content { display: contents; }
+
+.low-home-v2-topline p { margin: 0; }
+.low-home-v2-topline p:last-child { display: flex; align-items: center; gap: 8px; }
+.low-home-v2-topline p:last-child span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff3131;
+  box-shadow: 0 0 0 3px rgba(255, 49, 49, .12);
+}
+
+.low-home-v2-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 96px);
+  min-height: 0;
+}
+
+.low-home-v2-broadcast {
+  align-self: center;
+  width: min(100%, 660px);
+}
+
+.low-home-v2-section-label {
+  margin: 0 0 10px;
+  color: #8f8f8f;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.low-home-v2-player {
+  --v2-art: 152px;
+  position: relative;
+  display: grid !important;
+  grid-template-columns: var(--v2-art) minmax(0, 1fr) !important;
+  gap: 14px !important;
+  width: min(100%, 620px);
+  height: 154px;
+  min-height: 154px;
+  max-height: 154px;
+  padding: 0 !important;
+  border: 1px solid #343434 !important;
+  border-radius: 0 !important;
+  background: #030303 !important;
+}
+
+.low-home-v2-player > div:first-of-type {
+  width: var(--v2-art) !important;
+  height: var(--v2-art) !important;
+  max-width: var(--v2-art) !important;
+  min-height: var(--v2-art) !important;
+}
+.low-home-v2-player .rounded-lg { border-radius: 0 !important; background: #111 !important; }
+.low-home-v2-player > div:last-child { min-height: 0 !important; padding: 14px 14px 14px 0 !important; }
+.low-home-v2-player > div:last-child > div { min-height: 0 !important; height: 100%; justify-content: space-between !important; }
+.low-home-v2-player > div:last-child > div > div { min-height: 0 !important; }
+.low-home-v2-player h3 {
+  position: absolute;
+  z-index: 3;
+  left: 1px;
+  bottom: 1px;
+  display: flex;
+  align-items: center;
+  width: calc(var(--v2-art) - 2px);
+  min-height: 30px;
+  margin: 0 !important;
+  padding: 7px 10px;
+  background: rgba(0, 0, 0, .74);
+  color: #ededed !important;
+  font-size: 9px !important;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+.low-home-v2-player h3::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #ff3131;
+}
+.low-home-v2-player button { width: 38px !important; height: 38px !important; border-radius: 50% !important; }
+.low-home-v2-player button[aria-label="Oynat"],
+.low-home-v2-player button[aria-label="Duraklat"] {
+  width: 46px !important;
+  height: 46px !important;
+  background: #f4f4f4 !important;
+}
+.low-home-v2-player input[type="range"] { height: 3px !important; }
+.low-home-v2-player [class*="text-[10px]"],
+.low-home-v2-player .text-xs { font-size: 10px !important; }
+
+.low-home-v2-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(170px, .8fr);
+  gap: 24px;
+  margin-top: 14px;
+  color: #a5a5a5;
+  font-size: 11px;
+  line-height: 1.35;
+}
+.low-home-v2-copy p { margin: 0; }
+.low-home-v2-copy p:last-child {
+  padding-left: 18px;
+  border-left: 1px solid #303030;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.low-home-v2-mark {
+  position: relative;
+  align-self: center;
+  justify-self: end;
+  width: min(100%, 620px);
+  text-align: right;
+  user-select: none;
+}
+.low-home-v2-mark strong {
+  display: block;
+  color: #f4f4f4;
+  font-family: "Neue Haas Display", "Inter Tight", sans-serif;
+  font-size: clamp(230px, 26vw, 500px);
+  font-weight: 900;
+  line-height: .68;
+  letter-spacing: -.17em;
+  transform: scaleX(.76);
+  transform-origin: right center;
+}
+.low-home-v2-mark span {
+  display: block;
+  margin-top: clamp(18px, 3vh, 36px);
+  color: #f4f4f4;
+  font-family: "Neue Haas Display", "Inter Tight", sans-serif;
+  font-size: clamp(56px, 6vw, 116px);
+  font-weight: 900;
+  line-height: .8;
+  letter-spacing: -.07em;
+}
+
+.low-home-v2-manifesto {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  align-items: end;
+  gap: 24px;
+  padding-top: 14px;
+  border-top: 1px solid #292929;
+}
+.low-home-v2-manifesto > p {
+  margin: 0 0 5px;
+  color: #8f8f8f;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.low-home-v2-manifesto h1 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 28px;
+  margin: 0;
+  color: #f4f4f4;
+  font-size: clamp(34px, 3.75vw, 72px);
+  font-weight: 300;
+  line-height: .9;
+  letter-spacing: -.055em;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .low-home-v2-stage { grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr); gap: 28px; }
+  .low-home-v2-player { --v2-art: 126px; height: 128px; min-height: 128px; max-height: 128px; }
+  .low-home-v2-mark strong { font-size: clamp(210px, 30vw, 340px); }
+  .low-home-v2-mark span { font-size: clamp(48px, 7vw, 78px); }
+  .low-home-v2-manifesto { grid-template-columns: 150px minmax(0, 1fr); }
+  .low-home-v2-manifesto h1 { font-size: clamp(30px, 3.6vw, 42px); }
+}
+
+@media (max-width: 700px) {
+  .low-home-v2-shell {
+    gap: 10px;
+    padding: 14px 14px 10px;
+  }
+  .low-home-v2-topline { padding-bottom: 8px; font-size: 8px; }
+  .low-home-v2-stage {
+    display: flex;
+    min-height: 0;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .low-home-v2-mark {
+    order: 1;
+    align-self: flex-end;
+    width: 100%;
+    text-align: right;
+  }
+  .low-home-v2-mark strong {
+    font-size: clamp(128px, 48vw, 220px);
+    line-height: .66;
+  }
+  .low-home-v2-mark span {
+    margin-top: 8px;
+    font-size: clamp(34px, 12vw, 54px);
+  }
+  .low-home-v2-broadcast { width: 100%; }
+  .low-home-v2-section-label { display: none; }
+  .low-home-v2-player {
+    --v2-art: 92px;
+    width: 100%;
+    height: 94px;
+    min-height: 94px;
+    max-height: 94px;
+    gap: 8px !important;
+  }
+  .low-home-v2-player > div:last-child { padding: 8px 8px 8px 0 !important; }
+  .low-home-v2-player button { width: 28px !important; height: 28px !important; }
+  .low-home-v2-player button[aria-label="Oynat"],
+  .low-home-v2-player button[aria-label="Duraklat"] { width: 34px !important; height: 34px !important; }
+  .low-home-v2-player h3 { min-height: 24px; padding: 5px 6px; font-size: 8px !important; }
+  .low-home-v2-copy { grid-template-columns: 1fr; gap: 4px; margin-top: 7px; font-size: 9px; }
+  .low-home-v2-copy p:first-child { display: none; }
+  .low-home-v2-copy p:last-child { padding-left: 0; border-left: 0; }
+  .low-home-v2-manifesto {
+    display: block;
+    padding-top: 8px;
+  }
+  .low-home-v2-manifesto > p { margin-bottom: 6px; font-size: 8px; }
+  .low-home-v2-manifesto h1 {
+    display: block;
+    font-size: clamp(27px, 9vw, 40px);
+    line-height: .92;
+    white-space: normal;
+  }
+  .low-home-v2-manifesto h1 span { display: block; }
+}
+
+/* LOW editorial navigation */
+.low-site-header {
+  border-color: #292929 !important;
+  background: rgba(0, 0, 0, .97) !important;
+}
+
+.low-site-header-frame {
+  padding-inline: clamp(14px, 3.2vw, 64px) !important;
+}
+
+.low-site-header-grid {
+  max-width: none !important;
+}
+
+.low-site-brand {
+  min-width: clamp(180px, 22vw, 320px);
+  border-right: 0;
+}
+
+.low-site-brand::before,
+.low-site-brand:hover::before {
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+.low-site-brand-logo {
+  display: block;
+  width: auto;
+  height: 24px;
+  object-fit: contain;
+}
+
+.low-site-brand-radio {
+  margin-left: 4px;
+  color: #f4f4f4;
+  font-family: "Inter Tight", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+
+.low-site-nav {
+  justify-content: flex-end !important;
+  gap: 0 !important;
+  padding: 0;
+}
+
+.low-site-nav-link {
+  position: relative;
+  width: clamp(108px, 8.5vw, 136px);
+  margin-right: 0;
+  padding: 0 !important;
+  color: #8f8f8f !important;
+  font-family: "Inter Tight", "Segoe UI", sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.low-site-nav-link::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: transparent;
+}
+
+.low-site-nav-link:hover,
+.low-site-nav-link-active {
+  color: #f4f4f4 !important;
+}
+
+.low-site-nav-link-active::after {
+  background: #f4f4f4;
+}
+
+.low-site-account {
+  width: clamp(108px, 8.5vw, 136px);
+  min-width: clamp(108px, 8.5vw, 136px);
+  border-left: 0;
+  background: transparent !important;
+  color: #b5b5b5 !important;
+  font-family: "Inter Tight", "Segoe UI", sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding-inline: 8px !important;
+}
+
+.low-site-account:hover { color: #fff !important; }
+
+@media (max-width: 1100px) and (min-width: 1024px) {
+  .low-site-brand { min-width: 165px; }
+  .low-site-nav { padding: 0; }
+  .low-site-nav-link { width: 104px; margin-right: 0; font-size: 9px !important; }
+  .low-site-account { width: 104px; min-width: 104px; }
+}
+
+@media (max-width: 1023px) {
+  .low-site-brand {
+    min-width: 0;
+    border-right: 0;
+  }
+  .low-site-menu-trigger {
+    border: 1px solid #292929;
+    border-radius: 0 !important;
+  }
+  .low-site-mobile-menu {
+    border-bottom: 1px solid #292929;
+    background: rgba(0, 0, 0, .98) !important;
+  }
+  .low-site-mobile-menu nav > a {
+    border-bottom: 1px solid #242424;
+    padding: 14px 2px !important;
+    font-family: "Inter Tight", "Segoe UI", sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    text-transform: none;
+  }
+}
+
+@media (max-height: 720px) and (min-width: 701px) {
+  .low-home-v2-shell { padding-top: 16px; padding-bottom: 12px; gap: 10px; }
+  .low-home-v2-player { --v2-art: 108px; height: 110px; min-height: 110px; max-height: 110px; }
+  .low-home-v2-mark strong { font-size: clamp(190px, 24vw, 320px); }
+  .low-home-v2-mark span { margin-top: 12px; font-size: clamp(44px, 5vw, 72px); }
+  .low-home-v2-copy { margin-top: 8px; }
+}
+
+/* Ana sayfa v3 — split-screen broadcast console */
+.low-home-v2-shell {
+  gap: 0;
+  padding: 0 clamp(24px, 3.2vw, 64px) clamp(18px, 2vw, 30px);
+}
+
+.low-home-v2-topline {
+  min-height: clamp(54px, 8vh, 78px);
+  padding: 0;
+  translate: 0 clamp(28px, 4vh, 46px);
+}
+
+.low-home-v2-stage {
+  grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr);
+  gap: 0;
+  border-bottom: 1px solid #292929;
+  translate: 0 clamp(28px, 4vh, 46px);
+}
+
+.low-home-v2-mark {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: stretch;
+  justify-self: stretch;
+  display: flex;
+  width: auto;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(30px, 4.5vh, 52px) clamp(30px, 4vw, 72px) clamp(30px, 4.5vh, 52px) 0;
+  border-right: 0;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.low-home-v2-mark::after {
+  content: "";
+  position: absolute;
+  top: clamp(22px, 4vh, 42px);
+  right: 0;
+  bottom: clamp(22px, 4vh, 42px);
+  width: 1px;
+  background: #292929;
+}
+
+.low-home-v2-mark-logo {
+  display: block;
+  width: min(100%, 760px);
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+  translate: 0 clamp(16px, 2.2vh, 24px);
+}
+
+.low-home-v2-mark > strong {
+  display: none;
+}
+
+.low-home-v2-mark strong {
+  font-size: clamp(250px, 25vw, 480px);
+  line-height: .64;
+  transform: scaleX(.78);
+  transform-origin: left center;
+  translate: 0 clamp(16px, 2.2vh, 24px);
+}
+
+.low-home-v2-mark span {
+  align-self: flex-end;
+  margin-top: clamp(22px, 4vh, 42px);
+  font-size: clamp(54px, 5.4vw, 104px);
+  translate: 0 clamp(16px, 2.2vh, 24px);
+}
+
+.low-home-v2-broadcast {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  width: min(100%, 640px);
+  padding-left: clamp(30px, 4vw, 72px);
+}
+
+.low-home-v2-section-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+  color: #c1c1c1;
+}
+.low-home-v2-section-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff3131;
+}
+
+.low-home-v2-player {
+  --v2-art: 138px;
+  width: 100%;
+  height: 140px;
+  min-height: 140px;
+  max-height: 140px;
+  border-color: #404040 !important;
+}
+
+.low-home-v2-player > div:last-child { padding: 12px 12px 12px 0 !important; }
+.low-home-v2-player button { width: 32px !important; height: 32px !important; }
+.low-home-v2-player button[aria-label="Oynat"],
+.low-home-v2-player button[aria-label="Duraklat"] { width: 40px !important; height: 40px !important; }
+
+.low-home-v2-copy {
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 12px;
+}
+.low-home-v2-copy p:first-child { max-width: 470px; }
+.low-home-v2-copy p:last-child {
+  padding: 10px 0 0;
+  border-top: 1px solid #292929;
+  border-left: 0;
+}
+
+.low-home-v2-manifesto {
+  grid-template-columns: minmax(150px, .3fr) minmax(0, 1.7fr);
+  min-height: clamp(118px, 18vh, 170px);
+  padding-top: 18px;
+  border-top: 0;
+}
+
+.low-home-v2-manifesto h1 {
+  font-size: clamp(34px, 3.25vw, 62px);
+}
+
+@media (max-width: 1100px) and (min-width: 701px) {
+  .low-home-v2-stage { grid-template-columns: minmax(0, .9fr) minmax(390px, 1.1fr); }
+  .low-home-v2-mark { padding-right: 28px; }
+  .low-home-v2-mark strong { font-size: clamp(220px, 27vw, 320px); }
+  .low-home-v2-mark span { font-size: clamp(48px, 6vw, 68px); }
+  .low-home-v2-broadcast { padding-left: 28px; }
+  .low-home-v2-manifesto { min-height: 108px; }
+}
+
+@media (max-width: 700px) {
+  .low-home-v2-shell { padding: 0 14px 10px; }
+  .low-home-v2-topline { min-height: 38px; }
+  .low-home-v2-stage {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 14px;
+    border-bottom: 0;
+    translate: none;
+  }
+  .low-home-v2-topline { translate: none; }
+  .low-home-v2-mark {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    display: flex;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 16px 0;
+    border-right: 0;
+    border-bottom: 1px solid #292929;
+  }
+  .low-home-v2-mark::after { display: none; }
+  .low-home-v2-mark-logo {
+    align-self: center;
+    width: min(72%, 300px);
+    translate: none;
+  }
+  .low-home-v2-mark strong {
+    font-size: clamp(118px, 43vw, 190px);
+    line-height: .66;
+    translate: none;
+  }
+  .low-home-v2-mark span {
+    align-self: center;
+    margin: 0;
+    font-size: clamp(24px, 8vw, 34px);
+    translate: none;
+  }
+  .low-home-v2-broadcast {
+    order: 2;
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    padding-left: 0;
+  }
+  .low-home-v2-player {
+    --v2-art: 86px;
+    height: 88px;
+    min-height: 88px;
+    max-height: 88px;
+  }
+  .low-home-v2-copy { margin-top: 6px; }
+  .low-home-v2-manifesto {
+    min-height: 112px;
+    padding-top: 8px;
+    border-top: 1px solid #292929;
+  }
+  .low-home-v2-manifesto h1 { font-size: clamp(27px, 8.5vw, 38px); }
 }
 
 @layer base {
@@ -548,7 +1441,7 @@
   .container {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
-  /* LowRadio: sade, gölgesiz */
+  /* LOWRadio: sade, gölgesiz */
   .shadow-brutal {
     box-shadow: none;
   }
@@ -722,4 +1615,173 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Mobile homepage v4 — independent editorial layout */
+@media (max-width: 700px) {
+  .low-home-v2-shell {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 12px 8px;
+    overflow: hidden;
+  }
+
+  .low-home-v2-topline {
+    display: flex;
+    min-height: 40px;
+    flex: 0 0 40px;
+    align-items: center;
+    padding: 0;
+    border-bottom: 1px solid #292929;
+    font-size: 7px;
+    letter-spacing: .07em;
+    translate: none;
+  }
+
+  .low-home-v2-mobile-content {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: 54px;
+    translate: 0 -36px;
+  }
+
+  .low-home-v2-stage {
+    display: flex;
+    min-height: 0;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 54px;
+    margin-top: 0;
+    border: 0;
+    translate: none;
+  }
+
+  .low-home-v2-mark {
+    display: flex;
+    width: 100%;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 15px 0 18px;
+    border: 0;
+    border-bottom: 1px solid #292929;
+  }
+
+  .low-home-v2-mark::after { display: none; }
+
+  .low-home-v2-mark-logo {
+    display: block;
+    width: min(68%, 255px);
+    height: auto;
+    flex: 0 1 auto;
+    object-fit: contain;
+    translate: none;
+  }
+
+  .low-home-v2-mark > strong { display: none; }
+
+  .low-home-v2-mark > span {
+    display: block;
+    align-self: center;
+    margin: 4px 0 0;
+    color: #f4f4f4;
+    font-size: clamp(22px, 7.5vw, 30px);
+    line-height: 1;
+    translate: none;
+  }
+
+  .low-home-v2-broadcast {
+    width: 100%;
+    padding: 0;
+  }
+
+  .low-home-v2-section-label {
+    display: flex;
+    margin: 0 0 8px;
+    font-size: 8px;
+  }
+
+  .low-home-v2-player {
+    --v2-art: 96px;
+    width: 100%;
+    height: 98px;
+    min-height: 98px;
+    max-height: 98px;
+  }
+
+  .low-home-v2-player > div:last-child {
+    padding: 8px 8px 8px 0 !important;
+  }
+
+  .low-home-v2-player h3 {
+    min-height: 22px;
+    padding: 4px 6px;
+    font-size: 8px !important;
+  }
+
+  .low-home-v2-player button { width: 28px !important; height: 28px !important; }
+  .low-home-v2-player button[aria-label="Oynat"],
+  .low-home-v2-player button[aria-label="Duraklat"] { width: 34px !important; height: 34px !important; }
+
+  .low-home-v2-copy {
+    display: block;
+    margin-top: 8px;
+    font-size: 8px;
+  }
+
+  .low-home-v2-copy p:first-child { display: none; }
+  .low-home-v2-copy p:last-child {
+    padding: 0;
+    border: 0;
+  }
+
+  .low-home-v2-manifesto {
+    display: flex;
+    min-height: 0;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    margin-top: 0;
+    padding: 18px 0 14px;
+    border-top: 1px solid #292929;
+  }
+
+  .low-home-v2-manifesto > p {
+    width: 100%;
+    align-self: stretch;
+    margin: 0;
+    padding-left: 4px;
+    font-size: 8px;
+    text-align: left;
+    translate: none;
+  }
+
+  .low-home-v2-manifesto h1 {
+    display: block;
+    margin: -22px 0 0;
+    font-size: clamp(40px, 12.5vw, 54px);
+    line-height: .88;
+    letter-spacing: -.06em;
+  }
+
+  .low-home-v2-manifesto h1 span { display: block; }
+}
+
+@media (max-width: 700px) and (max-height: 650px) {
+  .low-home-v2-mobile-content { gap: 32px; translate: 0 -22px; }
+  .low-home-v2-stage { gap: 32px; margin-top: 10px; }
+  .low-home-v2-mark { padding: 8px 0 10px; }
+  .low-home-v2-mark-logo { width: min(58%, 220px); }
+  .low-home-v2-player { --v2-art: 82px; height: 84px; min-height: 84px; max-height: 84px; }
+  .low-home-v2-manifesto { margin-top: 0; padding: 10px 0 8px; }
+  .low-home-v2-manifesto h1 { font-size: clamp(34px, 10.5vw, 44px); }
 }
