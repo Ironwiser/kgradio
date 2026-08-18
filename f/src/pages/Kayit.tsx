@@ -93,10 +93,10 @@ export function Kayit() {
             </div>
             {error && <p className="editorial-form-error" role="alert">{error}</p>}
             <Button type="submit" disabled={loading} className="editorial-submit">
-              <span>{loading ? "Kaydediliyor…" : "Kayıt Ol"}</span><i aria-hidden>↗</i>
+              <span>{loading ? "Kaydediliyor…" : "Kayıt Ol"}</span><i className="low-ui-arrow" aria-hidden />
             </Button>
           </form>
-          <p className="editorial-form-switch">Zaten hesabınız var mı? <Link to="/giris">Giriş yap ↗</Link></p>
+          <p className="editorial-form-switch">Zaten hesabınız var mı? <Link to="/giris">Giriş yap <i className="low-ui-arrow" aria-hidden /></Link></p>
         </div>
       </div>
     </section>

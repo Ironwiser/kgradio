@@ -4,6 +4,7 @@ import { useLocation, useOutlet } from "react-router-dom"
 import { Header } from "./Header"
 import { Footer } from "./Footer"
 import { PersistentLivePlayer } from "@/components/player/PersistentLivePlayer"
+import { MobileLiveDock } from "@/components/player/MobileLiveDock"
 
 const routeOrder: Record<string, number> = {
   "/": 0,
@@ -60,6 +61,7 @@ export function MainLayout() {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-background">
       <Header />
+      <MobileLiveDock />
       <main className="route-transition-viewport flex min-h-0 w-full min-w-0 flex-1 flex-col">
         <div className={`route-transition-stage${transition ? ` route-transition-${transition.direction}` : ""}`}>
           {transition ? (

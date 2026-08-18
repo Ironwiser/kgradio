@@ -35,6 +35,12 @@ function getPlaybackPersistPreference(kind: PlaybackPersistKind) {
   return window.localStorage.getItem(PLAYBACK_PERSIST_KEYS[kind]) === "true"
 }
 
+function getFreshLiveStreamUrl(src: string) {
+  const url = new URL(src, window.location.href)
+  url.searchParams.set("_lowradio_live", Date.now().toString())
+  return url.href
+}
+
 function getSharedLiveAnalyser(audio: HTMLAudioElement) {
   if (sharedLiveAnalyser) return sharedLiveAnalyser
   const context = new window.AudioContext()
@@ -389,16 +395,22 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
 
     if (isPlaying) {
       audio.pause()
+      if (isLive) {
+        audio.removeAttribute("src")
+        audio.load()
+        setCurrentTime(0)
+        setDuration(0)
+      }
     } else {
       setError(null)
       setIsLoading(true)
-      if (isLive && persistenceKind === "live" && !getPlaybackPersistPreference("live") && src) {
-        // Kalıcı oynatma kapalıyken her manuel başlangıçta eski canlı tamponunu
-        // bırakıp akışın güncel canlı ucuna yeniden bağlan.
+      if (isLive && src) {
+        // Canlı akış hiçbir zaman bekleyen eski tamponu kullanmaz. Her manuel
+        // başlangıç AzuraCast'in o anki canlı ucuna yeni bir bağlantı açar.
         audio.pause()
         audio.removeAttribute("src")
         audio.load()
-        audio.src = src
+        audio.src = getFreshLiveStreamUrl(src)
         audio.load()
       }
       audio.play().catch(() => {
@@ -407,7 +419,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       }).finally(() => setIsLoading(false))
     }
     setIsPlaying(!isPlaying)
-  }, [isLive, isPlaying, persistenceKind, src])
+  }, [isLive, isPlaying, src])
 
   React.useEffect(() => {
     const audio = audioRef.current
@@ -469,6 +481,25 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   React.useEffect(() => {
     const audio = audioRef.current
     if (!audio || src === undefined) return
+
+    if (isLive) {
+      const mayContinueAcrossPages = getPlaybackPersistPreference("live")
+      if (mayContinueAcrossPages && !audio.paused) {
+        setIsPlaying(true)
+        return
+      }
+
+      // Sayfa açılırken canlı URL'yi audio elementine bağlama. Böylece play
+      // tıklanana kadar yayın indirilmez ve eski bir canlı tampon beklemez.
+      audio.pause()
+      audio.removeAttribute("src")
+      audio.load()
+      setIsPlaying(false)
+      setCurrentTime(0)
+      setDuration(0)
+      return
+    }
+
     const nextSrc = new URL(src, window.location.href).href
     if (persistenceKind && audio.src === nextSrc) {
       const mayContinueAcrossPages = getPlaybackPersistPreference(persistenceKind)
@@ -495,7 +526,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         if (name !== "NotAllowedError") setError("Çalınamadı.")
       }).finally(() => setIsLoading(false))
     }
-  }, [src, autoPlay, audioRef, persistenceKind])
+  }, [src, autoPlay, audioRef, persistenceKind, isLive])
 
   React.useEffect(() => {
     if (persistenceKind !== "archive" || !persistPlayback || !src) return

@@ -101,7 +101,7 @@ export function Listeler() {
                   >
                     <span>{String(index + 1).padStart(2, "0")}</span>
                     <strong>{track.displayName}</strong>
-                    <i aria-hidden>↗</i>
+                    <i className="low-ui-arrow" aria-hidden />
                   </button>
                 </li>
               ))}

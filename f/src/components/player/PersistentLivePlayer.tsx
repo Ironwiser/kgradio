@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react"
 import { Player } from "@/components/player/Player"
 import { useAzuraCastNowPlaying } from "@/hooks/useAzuraCastNowPlaying"
+import { useMobileLayout } from "@/hooks/useMobileLayout"
 
 const LIVE_STREAM_URL = "https://radio.lowradio.com/listen/lowradio/radio.mp3"
 const NOW_PLAYING_URL = "https://radio.lowradio.com/api/nowplaying/lowradio"
@@ -30,6 +31,7 @@ function readPersistedPlayback() {
 }
 
 export function PersistentLivePlayer({ pathname }: { pathname: string }) {
+  const isMobile = useMobileLayout()
   const [persisted, setPersisted] = useState(readPersistedPlayback)
   const popupRef = useRef<HTMLElement>(null)
   const dragOffsetRef = useRef({ x: 0, y: 0 })
@@ -50,7 +52,7 @@ export function PersistentLivePlayer({ pathname }: { pathname: string }) {
   const showLive = persisted.live && pathname !== "/" && pathname !== "/canli"
   const showArchive = persisted.archive && !!persisted.archiveSnapshot && pathname !== "/calma-listeleri"
   const mode = showLive ? "live" : showArchive ? "archive" : null
-  if (!mode) return null
+  if (isMobile || !mode) return null
 
   const disablePersistentPlayback = () => {
     localStorage.setItem(mode === "live" ? LIVE_PERSIST_KEY : ARCHIVE_PERSIST_KEY, "false")

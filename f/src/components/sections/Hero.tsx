@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Player } from "@/components/player/Player"
 import { useAzuraCastNowPlaying } from "@/hooks/useAzuraCastNowPlaying"
+import { useMobileLayout } from "@/hooks/useMobileLayout"
 
 const heroConfig = {
   subtitle: "NO ALGORITHMS · PURE TRANSMISSION",
@@ -14,6 +15,7 @@ const NOW_PLAYING_URL =
   "https://radio.lowradio.com/api/nowplaying/lowradio"
 
 export function Hero() {
+  const isMobile = useMobileLayout()
   const [videoList, setVideoList] = useState<string[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -82,16 +84,18 @@ export function Hero() {
 
         <div className="low-home-v2-mobile-content">
           <div className="low-home-v2-stage">
-            <div className="low-home-v2-broadcast">
+            <div className={`low-home-v2-broadcast${isMobile ? " low-home-v2-broadcast-mobile" : ""}`}>
               <p className="low-home-v2-section-label">LIVE TRANSMISSION</p>
-              <Player
-                src={LIVE_STREAM_URL}
-                title={snapshot.stationName || "LOWRadio Canlı"}
-                trackName={currentTrack ? `${currentTrack.artist} — ${currentTrack.title}` : undefined}
-                artworkUrl={currentTrack?.artworkUrl}
-                isLive
-                className="low-home-v2-player"
-              />
+              {!isMobile && (
+                <Player
+                  src={LIVE_STREAM_URL}
+                  title={snapshot.stationName || "LOWRadio Canlı"}
+                  trackName={currentTrack ? `${currentTrack.artist} — ${currentTrack.title}` : undefined}
+                  artworkUrl={currentTrack?.artworkUrl}
+                  isLive
+                  className="low-home-v2-player"
+                />
+              )}
               <div className="low-home-v2-copy">
                 <p>Bağımsız sesleri, seçkileri ve canlı yayınları algoritmalardan uzak bir araya getiriyoruz.</p>
                 <p>{heroConfig.subtitle}</p>

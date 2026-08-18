@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react"
 import type { CSSProperties } from "react"
 import { Player } from "@/components/player/Player"
 import { useAzuraCastNowPlaying } from "@/hooks/useAzuraCastNowPlaying"
+import { useMobileLayout } from "@/hooks/useMobileLayout"
 
 // AzuraCast canlı yayın URL'i (LOWRadio istasyonu)
 const LIVE_STREAM_URL =
@@ -51,6 +52,7 @@ function MovingTrackTitle({ title }: { title: string }) {
 }
 
 export function Canli() {
+  const isMobile = useMobileLayout()
   const { snapshot, isLoading, isUnavailable } = useAzuraCastNowPlaying(NOW_PLAYING_URL)
   const currentTrack = snapshot.currentSong
 
@@ -86,7 +88,7 @@ export function Canli() {
               </div>
             </div>
 
-            <div className="live-studio-player-wrap">
+            {!isMobile && <div className="live-studio-player-wrap">
               <div className="live-studio-player-label">
                 <span>NOW PLAYING</span>
                 <span>{snapshot.stationName}</span>
@@ -99,7 +101,7 @@ export function Canli() {
                 isLive
                 className="editorial-player live-studio-player"
               />
-            </div>
+            </div>}
           </section>
 
           <section className="live-studio-board">

@@ -202,7 +202,7 @@ export function Header() {
             >
               <span className="low-mobile-nav-index">0{index + 1}</span>
               <span>{label}</span>
-              <span className="low-mobile-nav-arrow" aria-hidden>↗</span>
+              <span className="low-mobile-nav-arrow" aria-hidden />
             </Link>
           ))}
 

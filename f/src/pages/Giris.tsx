@@ -95,10 +95,10 @@ export function Giris() {
             </div>
             {error && <p className="editorial-form-error" role="alert">{error}</p>}
             <Button type="submit" disabled={loading} className="editorial-submit">
-              <span>{loading ? "Giriş yapılıyor…" : "Giriş Yap"}</span><i aria-hidden>↗</i>
+              <span>{loading ? "Giriş yapılıyor…" : "Giriş Yap"}</span><i className="low-ui-arrow" aria-hidden />
             </Button>
           </form>
-          <p className="editorial-form-switch">Hesabınız yok mu? <Link to="/kayit">Kayıt ol ↗</Link></p>
+          <p className="editorial-form-switch">Hesabınız yok mu? <Link to="/kayit">Kayıt ol <i className="low-ui-arrow" aria-hidden /></Link></p>
         </div>
       </div>
     </section>
