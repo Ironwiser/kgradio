@@ -68,6 +68,7 @@ export function Listeler() {
             artworkUrl={playerArtworkUrl}
             trackInfoUrl={selectedTrack ? undefined : "/api/audio/current"}
             autoPlay={!!selectedTrack}
+            allowPersistentPlayback
             onPrevious={handlePrevious}
             onNext={handleNext}
             canGoPrevious={canGoPrevious}

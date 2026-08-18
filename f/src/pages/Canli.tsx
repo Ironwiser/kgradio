@@ -1,12 +1,13 @@
+import { useLayoutEffect, useRef, useState } from "react"
+import type { CSSProperties } from "react"
 import { Player } from "@/components/player/Player"
 import { useAzuraCastNowPlaying } from "@/hooks/useAzuraCastNowPlaying"
 
 // AzuraCast canlı yayın URL'i (LOWRadio istasyonu)
-// Not: Slug ekran görüntüsüne göre "lfo_radio"
 const LIVE_STREAM_URL =
-  "https://radio.lforadio.omurgenc.dev/listen/lfo_radio/radio.mp3"
+  "https://radio.lowradio.com/listen/lowradio/radio.mp3"
 const NOW_PLAYING_URL =
-  "https://radio.lforadio.omurgenc.dev/api/nowplaying/lfo_radio"
+  "https://radio.lowradio.com/api/nowplaying/lowradio"
 
 function formatPlayedAt(timestamp?: number) {
   if (!timestamp) return "—"
@@ -14,6 +15,39 @@ function formatPlayedAt(timestamp?: number) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(timestamp * 1000))
+}
+
+function MovingTrackTitle({ title }: { title: string }) {
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLHeadingElement>(null)
+  const [overflowDistance, setOverflowDistance] = useState(0)
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current
+    const text = textRef.current
+    if (!viewport || !text) return
+
+    const measure = () => {
+      setOverflowDistance(Math.max(0, text.scrollWidth - viewport.clientWidth + 24))
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(viewport)
+    observer.observe(text)
+    return () => observer.disconnect()
+  }, [title])
+
+  return (
+    <div
+      ref={viewportRef}
+      className="live-studio-title-window"
+      data-overflow={overflowDistance > 0 ? "true" : "false"}
+      style={{ "--track-title-distance": `${overflowDistance}px` } as CSSProperties}
+    >
+      <h1 ref={textRef} id="live-studio-title">{title}</h1>
+    </div>
+  )
 }
 
 export function Canli() {
@@ -34,17 +68,22 @@ export function Canli() {
 
         <main className="live-studio-main">
           <section className="live-studio-hero" aria-labelledby="live-studio-title">
-            <div className="live-studio-heading">
-              <p>{snapshot.isLive ? "LIVE BROADCAST" : "AUTODJ TRANSMISSION"}</p>
-              <h1 id="live-studio-title">
-                {currentTrack?.title || (isLoading ? "Sinyal aranıyor" : "Canlı yayın")}
-              </h1>
-              <strong>{currentTrack?.artist || "LOWRadio kesintisiz seçki"}</strong>
-              <span>
-                {snapshot.streamerName
-                  ? `Yayıncı · ${snapshot.streamerName}`
-                  : currentTrack?.album || "Bağımsız yayın · Dünya çapında"}
-              </span>
+            <div
+              key={currentTrack?.id || "station-idle"}
+              className="live-studio-heading player-track-transition"
+            >
+              <div className="live-studio-track-panel">
+                <p>{snapshot.isLive ? "LIVE BROADCAST" : "AUTODJ TRANSMISSION"}</p>
+                <MovingTrackTitle
+                  title={currentTrack?.title || (isLoading ? "Sinyal aranıyor" : "Canlı yayın")}
+                />
+                <strong>{currentTrack?.artist || "LOWRadio kesintisiz seçki"}</strong>
+                <span>
+                  {snapshot.streamerName
+                    ? `Yayıncı · ${snapshot.streamerName}`
+                    : currentTrack?.album || "Bağımsız yayın · Dünya çapında"}
+                </span>
+              </div>
             </div>
 
             <div className="live-studio-player-wrap">
@@ -57,7 +96,7 @@ export function Canli() {
                 title={snapshot.stationName}
                 trackName={currentTrack ? `${currentTrack.artist} — ${currentTrack.title}` : undefined}
                 artworkUrl={currentTrack?.artworkUrl}
-                autoPlay
+                isLive
                 className="editorial-player live-studio-player"
               />
             </div>

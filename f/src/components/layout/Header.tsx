@@ -32,7 +32,7 @@ export function Header() {
   }, [rightDropdownOpen])
 
   const openDjPanel = () => {
-    window.open("https://radio.lforadio.omurgenc.dev", "_blank", "noopener,noreferrer")
+    window.open("https://radio.lowradio.com", "_blank", "noopener,noreferrer")
   }
 
   return (
@@ -189,22 +189,24 @@ export function Header() {
         style={{ background: "rgba(0, 0, 0, 0.96)" }}
         aria-hidden={!mobileOpen}
       >
-        <nav className="flex flex-col px-4 py-4 md:px-[16px] md:py-[16px] gap-2 md:gap-[8px] pb-6 md:pb-[24px]">
-          {navLinks.map(({ to, label }) => (
+        <nav className="low-mobile-nav flex flex-col px-4 py-4 md:px-[16px] md:py-[16px] gap-2 md:gap-[8px] pb-6 md:pb-[24px]">
+          {navLinks.map(({ to, label }, index) => (
             <Link
               key={label}
               to={to}
               onClick={closeMobile}
               className={cn(
-                "nav-link-glitch font-brutal-heading py-[10px] px-3 text-xl md:text-[20px] capitalize transition-colors touch-manipulation",
+                "low-mobile-nav-link nav-link-glitch font-brutal-heading py-[10px] px-3 text-xl md:text-[20px] capitalize transition-colors touch-manipulation",
                 location.pathname === to ? "text-white" : "text-white/70 hover:text-white"
               )}
             >
+              <span className="low-mobile-nav-index">0{index + 1}</span>
               <span>{label}</span>
+              <span className="low-mobile-nav-arrow" aria-hidden>↗</span>
             </Link>
           ))}
 
-          <div className="mt-4 border-t border-border pt-4 flex flex-col gap-2 items-stretch">
+          <div className="low-mobile-account mt-4 border-t border-border pt-4 flex flex-col gap-2 items-stretch">
             <p className="px-3 font-brutal-heading text-xs md:text-[12px] uppercase tracking-wider text-white/45">
               {user ? "Hesap" : "Üyelik"}
             </p>
@@ -224,14 +226,14 @@ export function Header() {
                 <Link
                   to="/giris"
                   onClick={closeMobile}
-                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center justify-center bg-white/90 px-4 md:px-[16px] py-2.5 md:py-[10px] text-lg md:text-[18px] font-semibold text-black touch-manipulation hover:bg-white"
+                  className="low-mobile-login nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center justify-center bg-white/90 px-4 md:px-[16px] py-2.5 md:py-[10px] text-lg md:text-[18px] font-semibold text-black touch-manipulation hover:bg-white"
                 >
                   <span>Giriş Yap</span>
                 </Link>
                 <Link
                   to="/kayit"
                   onClick={closeMobile}
-                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center justify-center border border-[#facc15]/40 bg-[#facc15]/10 px-4 md:px-[16px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-[#facc15] touch-manipulation hover:text-[#fde047]"
+                  className="low-mobile-register nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center justify-center border border-[#facc15]/40 bg-[#facc15]/10 px-4 md:px-[16px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-[#facc15] touch-manipulation hover:text-[#fde047]"
                 >
                   <span>Kayıt Ol</span>
                 </Link>
@@ -241,7 +243,7 @@ export function Header() {
                     closeMobile()
                     openDjPanel()
                   }}
-                  className="nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center px-3 md:px-[12px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-white/60 touch-manipulation hover:text-white/90 text-left"
+                  className="low-mobile-dj nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center px-3 md:px-[12px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-white/60 touch-manipulation hover:text-white/90 text-left"
                 >
                   <span>DJ Girişi</span>
                 </button>

@@ -118,7 +118,8 @@ export function useAzuraCastNowPlaying(endpoint: string) {
         }
         if (!cancelled) {
           setIsLoading(false)
-          timer = window.setTimeout(load, 15_000)
+          // Parça geçişlerinin arayüze geç yansımaması için kısa aralıkla güncelle.
+          timer = window.setTimeout(load, 5_000)
         }
       }
     }

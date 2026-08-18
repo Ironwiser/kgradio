@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Player } from "@/components/player/Player"
+import { useAzuraCastNowPlaying } from "@/hooks/useAzuraCastNowPlaying"
 
 const heroConfig = {
   subtitle: "NO ALGORITHMS · PURE TRANSMISSION",
@@ -8,12 +9,16 @@ const heroConfig = {
 const FALLBACK_VIDEO = "WhatsApp Video 2026-02-07 at 03.07.32.mp4"
 const HERO_BACKGROUND_VIDEO_ENABLED = false
 const LIVE_STREAM_URL =
-  "https://radio.lforadio.omurgenc.dev/listen/lfo_radio/radio.mp3"
+  "https://radio.lowradio.com/listen/lowradio/radio.mp3"
+const NOW_PLAYING_URL =
+  "https://radio.lowradio.com/api/nowplaying/lowradio"
 
 export function Hero() {
   const [videoList, setVideoList] = useState<string[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const { snapshot } = useAzuraCastNowPlaying(NOW_PLAYING_URL)
+  const currentTrack = snapshot.currentSong
 
   useEffect(() => {
     if (!HERO_BACKGROUND_VIDEO_ENABLED) return
@@ -81,7 +86,10 @@ export function Hero() {
               <p className="low-home-v2-section-label">LIVE TRANSMISSION</p>
               <Player
                 src={LIVE_STREAM_URL}
-                title="LOWRadio Canlı"
+                title={snapshot.stationName || "LOWRadio Canlı"}
+                trackName={currentTrack ? `${currentTrack.artist} — ${currentTrack.title}` : undefined}
+                artworkUrl={currentTrack?.artworkUrl}
+                isLive
                 className="low-home-v2-player"
               />
               <div className="low-home-v2-copy">

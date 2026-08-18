@@ -6,6 +6,161 @@ import { cn } from "@/lib/utils"
 
 type GlyphProps = { className?: string }
 const PLAYER_ERROR_MESSAGE = "Yayın şu anda açılamıyor. Biraz sonra tekrar deneyin."
+type PlaybackPersistKind = "live" | "archive"
+const PLAYBACK_PERSIST_KEYS: Record<PlaybackPersistKind, string> = {
+  live: "lowradio-live-playback-persist",
+  archive: "lowradio-archive-playback-persist",
+}
+const PLAYBACK_PERSIST_EVENT = "lowradio-playback-persist-change"
+const ARCHIVE_PLAYBACK_SNAPSHOT_KEY = "lowradio-archive-playback-snapshot"
+const sharedLiveAudio = typeof Audio !== "undefined" ? new Audio() : null
+if (sharedLiveAudio) {
+  sharedLiveAudio.crossOrigin = "anonymous"
+  sharedLiveAudio.preload = "none"
+}
+const sharedLiveAudioRef: React.RefObject<HTMLAudioElement | null> = { current: sharedLiveAudio }
+const sharedArchiveAudio = typeof Audio !== "undefined" ? new Audio() : null
+if (sharedArchiveAudio) {
+  sharedArchiveAudio.crossOrigin = "anonymous"
+  sharedArchiveAudio.preload = "none"
+}
+const sharedArchiveAudioRef: React.RefObject<HTMLAudioElement | null> = { current: sharedArchiveAudio }
+let sharedLiveAudioContext: AudioContext | null = null
+let sharedLiveAnalyser: AnalyserNode | null = null
+const activePersistentPlayers: Record<PlaybackPersistKind, number> = { live: 0, archive: 0 }
+let activePlayerAudio: HTMLAudioElement | null = null
+
+function getPlaybackPersistPreference(kind: PlaybackPersistKind) {
+  if (typeof window === "undefined") return false
+  return window.localStorage.getItem(PLAYBACK_PERSIST_KEYS[kind]) === "true"
+}
+
+function getSharedLiveAnalyser(audio: HTMLAudioElement) {
+  if (sharedLiveAnalyser) return sharedLiveAnalyser
+  const context = new window.AudioContext()
+  const analyser = context.createAnalyser()
+  analyser.fftSize = 256
+  analyser.smoothingTimeConstant = 0.82
+  const source = context.createMediaElementSource(audio)
+  source.connect(analyser)
+  analyser.connect(context.destination)
+  sharedLiveAudioContext = context
+  sharedLiveAnalyser = analyser
+  return analyser
+}
+
+function LiveWaveform({
+  audioRef,
+  isPlaying,
+  shared = false,
+}: {
+  audioRef: React.RefObject<HTMLAudioElement | null>
+  isPlaying: boolean
+  shared?: boolean
+}) {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const audioContextRef = React.useRef<AudioContext | null>(null)
+  const analyserRef = React.useRef<AnalyserNode | null>(null)
+  const sourceRef = React.useRef<MediaElementAudioSourceNode | null>(null)
+  const silentFramesRef = React.useRef(0)
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current
+    const audio = audioRef.current
+    if (!canvas || !audio) return
+
+    let animationFrame = 0
+
+    const prepareAnalyser = () => {
+      if (shared) return getSharedLiveAnalyser(audio)
+      if (analyserRef.current) return analyserRef.current
+      const AudioContextClass = window.AudioContext
+      const context = audioContextRef.current ?? new AudioContextClass()
+      const analyser = context.createAnalyser()
+      analyser.fftSize = 256
+      analyser.smoothingTimeConstant = 0.82
+      const source = context.createMediaElementSource(audio)
+      source.connect(analyser)
+      analyser.connect(context.destination)
+      audioContextRef.current = context
+      analyserRef.current = analyser
+      sourceRef.current = source
+      return analyser
+    }
+
+    const draw = () => {
+      const context2d = canvas.getContext("2d")
+      if (!context2d) return
+      const dpr = window.devicePixelRatio || 1
+      const width = Math.max(1, Math.round(canvas.clientWidth * dpr))
+      const height = Math.max(1, Math.round(canvas.clientHeight * dpr))
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width
+        canvas.height = height
+      }
+
+      context2d.clearRect(0, 0, width, height)
+      context2d.beginPath()
+      context2d.lineWidth = Math.max(1.5, 1.5 * dpr)
+      context2d.strokeStyle = "#ff3035"
+      context2d.lineCap = "round"
+      context2d.lineJoin = "round"
+
+      const analyser = shared ? sharedLiveAnalyser : analyserRef.current
+      if (isPlaying && analyser) {
+        const samples = new Uint8Array(analyser.frequencyBinCount)
+        analyser.getByteTimeDomainData(samples)
+        const peak = samples.reduce((largest, sample) => Math.max(largest, Math.abs(sample - 128)), 0)
+        silentFramesRef.current = peak < 2 ? silentFramesRef.current + 1 : 0
+        const useSignalFallback = silentFramesRef.current > 18
+        samples.forEach((sample, index) => {
+          const x = (index / (samples.length - 1)) * width
+          const fallbackSignal =
+            Math.sin(index * .31 + performance.now() * .006) * .12 +
+            Math.sin(index * .11 - performance.now() * .003) * .06
+          const normalized = useSignalFallback ? fallbackSignal : (sample - 128) / 128
+          const y = height / 2 + normalized * height * 0.38
+          if (index === 0) context2d.moveTo(x, y)
+          else context2d.lineTo(x, y)
+        })
+      } else {
+        context2d.moveTo(0, height / 2)
+        context2d.lineTo(width, height / 2)
+      }
+      context2d.stroke()
+      animationFrame = window.requestAnimationFrame(draw)
+    }
+
+    if (isPlaying) {
+      try {
+        const analyser = prepareAnalyser()
+        const activeContext = shared ? sharedLiveAudioContext : audioContextRef.current
+        if (analyser && activeContext?.state === "suspended") {
+          void activeContext.resume()
+        }
+      } catch {
+        // CORS veya Web Audio desteği yoksa düz çizgi gösterilir; yayın etkilenmez.
+      }
+    }
+    draw()
+
+    return () => window.cancelAnimationFrame(animationFrame)
+  }, [audioRef, isPlaying, shared])
+
+  React.useEffect(() => () => {
+    if (shared) return
+    sourceRef.current?.disconnect()
+    analyserRef.current?.disconnect()
+    void audioContextRef.current?.close()
+  }, [shared])
+
+  return (
+    <div className="live-waveform" aria-label={isPlaying ? "Canlı ses sinyali" : "Yayın duraklatıldı"}>
+      <canvas ref={canvasRef} aria-hidden />
+      <span>{isPlaying ? "CANLI" : "BEKLEMEDE"}</span>
+    </div>
+  )
+}
 
 function PlayGlyph({ className }: GlyphProps) {
   return (
@@ -56,6 +211,45 @@ function StepGlyph({ direction, className }: GlyphProps & { direction: "back" | 
   )
 }
 
+function ScrollingTrackName({ text }: { text: string }) {
+  const viewportRef = React.useRef<HTMLDivElement>(null)
+  const textRef = React.useRef<HTMLParagraphElement>(null)
+  const [overflowDistance, setOverflowDistance] = React.useState(0)
+
+  React.useLayoutEffect(() => {
+    const viewport = viewportRef.current
+    const textElement = textRef.current
+    if (!viewport || !textElement) return
+
+    const measure = () => {
+      setOverflowDistance(Math.max(0, textElement.scrollWidth - viewport.clientWidth + 18))
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(viewport)
+    observer.observe(textElement)
+    return () => observer.disconnect()
+  }, [text])
+
+  return (
+    <div
+      ref={viewportRef}
+      className="player-track-name-window player-track-transition"
+      data-overflow={overflowDistance > 0 ? "true" : "false"}
+      style={{ "--player-track-distance": `${overflowDistance}px` } as React.CSSProperties}
+    >
+      <p
+        ref={textRef}
+        className="text-sm font-semibold text-white sm:text-base md:text-lg"
+        title={text}
+      >
+        {text}
+      </p>
+    </div>
+  )
+}
+
 export interface PlayerProps {
   /** Stream veya MP3 URL. Boşsa player hazır bekler. */
   src?: string
@@ -69,6 +263,10 @@ export interface PlayerProps {
   trackInfoUrl?: string
   /** true ise src değişince otomatik oynat (listeden tıklanınca) */
   autoPlay?: boolean
+  /** Canlı akışlarda yanıltıcı seek davranışını kapatır. */
+  isLive?: boolean
+  /** Arşiv kaydının diğer sayfalarda popup player ile sürmesini sağlar. */
+  allowPersistentPlayback?: boolean
   /** Önceki parçaya geç (liste varsa) */
   onPrevious?: () => void
   /** Sonraki parçaya geç (liste varsa) */
@@ -80,11 +278,18 @@ export interface PlayerProps {
   className?: string
 }
 
-export function Player({ src, title, trackName: trackNameProp, artworkUrl, trackInfoUrl, autoPlay, onPrevious, onNext, canGoPrevious = true, canGoNext = true, className }: PlayerProps) {
-  const audioRef = React.useRef<HTMLAudioElement>(null)
-  const [isPlaying, setIsPlaying] = React.useState(false)
-  const [volume, setVolume] = React.useState(1)
-  const [isMuted, setIsMuted] = React.useState(false)
+export function Player({ src, title, trackName: trackNameProp, artworkUrl, trackInfoUrl, autoPlay, isLive = false, allowPersistentPlayback = false, onPrevious, onNext, canGoPrevious = true, canGoNext = true, className }: PlayerProps) {
+  const localAudioRef = React.useRef<HTMLAudioElement>(null)
+  const persistenceKind: PlaybackPersistKind | null = isLive ? "live" : allowPersistentPlayback ? "archive" : null
+  const persistentAudio = persistenceKind === "live" ? sharedLiveAudio : persistenceKind === "archive" ? sharedArchiveAudio : null
+  const audioRef = persistenceKind === "live" ? sharedLiveAudioRef : persistenceKind === "archive" ? sharedArchiveAudioRef : localAudioRef
+  const [isPlaying, setIsPlaying] = React.useState(() => {
+    if (!persistentAudio || !persistenceKind) return false
+    return getPlaybackPersistPreference(persistenceKind) && !persistentAudio.paused
+  })
+  const [volume, setVolume] = React.useState(() => persistentAudio?.volume ?? 1)
+  const [isMuted, setIsMuted] = React.useState(() => persistentAudio?.muted ?? false)
+  const [persistPlayback, setPersistPlayback] = React.useState(() => persistenceKind ? getPlaybackPersistPreference(persistenceKind) : false)
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [trackName, setTrackName] = React.useState<string | null>(null)
@@ -95,8 +300,70 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   const [currentTime, setCurrentTime] = React.useState(0)
   const [duration, setDuration] = React.useState(0)
   const [volumeOpen, setVolumeOpen] = React.useState(false)
+  const [volumeLayout, setVolumeLayout] = React.useState<"inline" | "popover">("inline")
+  const controlsRowRef = React.useRef<HTMLDivElement>(null)
+  const primaryControlsRef = React.useRef<HTMLDivElement>(null)
   const volumeRef = React.useRef<HTMLDivElement>(null)
+  const volumeCloseTimerRef = React.useRef<number | null>(null)
   const isSeekingRef = React.useRef(false)
+
+  const cancelVolumeClose = React.useCallback(() => {
+    if (volumeCloseTimerRef.current !== null) {
+      window.clearTimeout(volumeCloseTimerRef.current)
+      volumeCloseTimerRef.current = null
+    }
+  }, [])
+
+  React.useEffect(() => () => cancelVolumeClose(), [cancelVolumeClose])
+
+  React.useEffect(() => {
+    if (!persistenceKind) return
+    const syncPreference = () => {
+      setPersistPlayback(getPlaybackPersistPreference(persistenceKind))
+    }
+    window.addEventListener(PLAYBACK_PERSIST_EVENT, syncPreference)
+    window.addEventListener("storage", syncPreference)
+    return () => {
+      window.removeEventListener(PLAYBACK_PERSIST_EVENT, syncPreference)
+      window.removeEventListener("storage", syncPreference)
+    }
+  }, [persistenceKind])
+
+  React.useEffect(() => {
+    if (!persistenceKind) return
+    activePersistentPlayers[persistenceKind] += 1
+    return () => {
+      activePersistentPlayers[persistenceKind] -= 1
+      // Kalıcı oynatma kapalıysa bu player sayfadan ayrıldığı anda sesi kesin
+      // olarak durdur. Rota geçişinde yeni player eski cleanup'tan önce mount
+      // olabildiği için yalnızca aktif örnek sayısına güvenmek otomatik yeniden
+      // başlamaya yol açıyordu.
+      if (!getPlaybackPersistPreference(persistenceKind)) {
+        const audio = audioRef.current
+        audio?.pause()
+      }
+    }
+  }, [audioRef, persistenceKind])
+
+  React.useEffect(() => {
+    const controlsRow = controlsRowRef.current
+    const primaryControls = primaryControlsRef.current
+    if (!controlsRow || !primaryControls) return
+
+    const updateVolumeLayout = () => {
+      const styles = window.getComputedStyle(controlsRow)
+      const gap = Number.parseFloat(styles.columnGap || styles.gap) || 0
+      const availableWidth = controlsRow.clientWidth - primaryControls.offsetWidth - gap
+      setVolumeLayout(availableWidth >= 156 ? "inline" : "popover")
+    }
+
+    updateVolumeLayout()
+    const observer = new ResizeObserver(updateVolumeLayout)
+    observer.observe(controlsRow)
+    observer.observe(primaryControls)
+    return () => observer.disconnect()
+  }, [onPrevious, onNext])
+
   /** Dışarı tıklanınca volume panelini kapat (mobil) */
   React.useEffect(() => {
     if (!volumeOpen) return
@@ -125,19 +392,32 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     } else {
       setError(null)
       setIsLoading(true)
+      if (isLive && persistenceKind === "live" && !getPlaybackPersistPreference("live") && src) {
+        // Kalıcı oynatma kapalıyken her manuel başlangıçta eski canlı tamponunu
+        // bırakıp akışın güncel canlı ucuna yeniden bağlan.
+        audio.pause()
+        audio.removeAttribute("src")
+        audio.load()
+        audio.src = src
+        audio.load()
+      }
       audio.play().catch(() => {
         setError(PLAYER_ERROR_MESSAGE)
         setIsPlaying(false)
       }).finally(() => setIsLoading(false))
     }
     setIsPlaying(!isPlaying)
-  }, [isPlaying])
+  }, [isLive, isPlaying, persistenceKind, src])
 
   React.useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
 
     const onPlay = () => {
+      if (activePlayerAudio && activePlayerAudio !== audio) {
+        activePlayerAudio.pause()
+      }
+      activePlayerAudio = audio
       setIsPlaying(true)
       setError(null)
     }
@@ -166,6 +446,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     audio.addEventListener("timeupdate", onTimeUpdate)
     audio.addEventListener("loadedmetadata", onLoadedMetadata)
     audio.addEventListener("durationchange", onDurationChange)
+    setIsPlaying(!audio.paused)
+    setVolume(audio.volume)
+    setIsMuted(audio.muted)
     return () => {
       audio.removeEventListener("play", onPlay)
       audio.removeEventListener("pause", onPause)
@@ -175,7 +458,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       audio.removeEventListener("loadedmetadata", onLoadedMetadata)
       audio.removeEventListener("durationchange", onDurationChange)
     }
-  }, [])
+  }, [audioRef])
 
   React.useEffect(() => {
     const audio = audioRef.current
@@ -186,11 +469,25 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   React.useEffect(() => {
     const audio = audioRef.current
     if (!audio || src === undefined) return
+    const nextSrc = new URL(src, window.location.href).href
+    if (persistenceKind && audio.src === nextSrc) {
+      const mayContinueAcrossPages = getPlaybackPersistPreference(persistenceKind)
+      if (!mayContinueAcrossPages) {
+        audio.pause()
+        setIsPlaying(false)
+      } else {
+        setIsPlaying(!audio.paused)
+      }
+      if (autoPlay && audio.paused && mayContinueAcrossPages) {
+        void audio.play().catch(() => {})
+      }
+      return
+    }
     setError(null)
     setCurrentTime(0)
     setDuration(0)
     audio.src = src
-    const shouldPlay = autoPlay || isPlaying
+    const shouldPlay = autoPlay || (isPlaying && (!persistenceKind || getPlaybackPersistPreference(persistenceKind)))
     if (shouldPlay) {
       setIsLoading(true)
       audio.play().catch((e: unknown) => {
@@ -198,7 +495,18 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         if (name !== "NotAllowedError") setError("Çalınamadı.")
       }).finally(() => setIsLoading(false))
     }
-  }, [src, autoPlay])
+  }, [src, autoPlay, audioRef, persistenceKind])
+
+  React.useEffect(() => {
+    if (persistenceKind !== "archive" || !persistPlayback || !src) return
+    window.localStorage.setItem(ARCHIVE_PLAYBACK_SNAPSHOT_KEY, JSON.stringify({
+      src,
+      title: title || "LOWRadio Arşiv",
+      trackName: trackNameProp || "Arşiv kaydı",
+      artworkUrl: artworkUrl || null,
+    }))
+    window.dispatchEvent(new Event(PLAYBACK_PERSIST_EVENT))
+  }, [artworkUrl, persistPlayback, persistenceKind, src, title, trackNameProp])
 
   /** Çalan parça adı ve kapak: prop verilmişse onu kullan, yoksa trackInfoUrl'den al */
   React.useEffect(() => {
@@ -244,6 +552,20 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     setIsMuted(v === 0)
   }
 
+  const handlePersistPlaybackChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!persistenceKind) return
+    const enabled = e.target.checked
+    const otherKind: PlaybackPersistKind = persistenceKind === "live" ? "archive" : "live"
+    window.localStorage.setItem(PLAYBACK_PERSIST_KEYS[persistenceKind], String(enabled))
+    if (enabled) {
+      window.localStorage.setItem(PLAYBACK_PERSIST_KEYS[otherKind], "false")
+      const otherAudio = otherKind === "live" ? sharedLiveAudio : sharedArchiveAudio
+      otherAudio?.pause()
+    }
+    setPersistPlayback(enabled)
+    window.dispatchEvent(new Event(PLAYBACK_PERSIST_EVENT))
+  }
+
   const hasSource = src && src.length > 0
   const canPlay = hasSource
 
@@ -255,6 +577,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   }
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isLive) return
     const audio = audioRef.current
     if (!audio) return
     const t = Number(e.target.value)
@@ -263,10 +586,12 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   }
 
   const onSeekPointerDown = () => {
+    if (isLive) return
     isSeekingRef.current = true
   }
 
   const onSeekPointerUp = () => {
+    if (isLive) return
     isSeekingRef.current = false
     const audio = audioRef.current
     if (audio) setCurrentTime(audio.currentTime)
@@ -274,7 +599,8 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
 
   /** Progress bar: kaynak varken her zaman göster (süre yoksa 0:00 / --:-- ) */
   const showProgressBar = hasSource
-  const progressMax = Number.isFinite(duration) && duration > 0 ? duration : 1
+  const progressMax = isLive ? 1 : Number.isFinite(duration) && duration > 0 ? duration : 1
+  const progressValue = isLive ? 1 : currentTime
 
   const volumeVisible = volumeOpen
 
@@ -288,6 +614,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/95 text-black transition-colors touch-manipulation disabled:opacity-50 sm:bg-white"
 
   return (
+    <>
     <div
       className={cn(
         "flex flex-col overflow-hidden rounded-md border border-border bg-[#1a1a1a] min-w-0 w-full",
@@ -296,7 +623,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         className
       )}
     >
-      <audio ref={audioRef} preload="none" />
+      {!persistenceKind && <audio ref={localAudioRef} preload="none" crossOrigin="anonymous" />}
       {/* Sol: resim alanı – sm+ grid’de sağ sütunla eşit genişlik (1fr) */}
       <div
         className="flex w-full max-w-[4.5rem] shrink-0 items-center justify-center sm:h-20 sm:w-20 sm:max-w-none md:h-24 md:w-24 lg:h-28 lg:w-28 max-sm:aspect-square max-sm:h-auto"
@@ -310,9 +637,10 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         >
           {resolvedArtworkUrl && !artworkLoadFailed ? (
             <img
+              key={resolvedArtworkUrl}
               src={resolvedArtworkUrl}
               alt=""
-              className="h-full w-full object-cover"
+              className="player-track-transition h-full w-full object-cover"
               onError={() => setArtworkLoadFailed(true)}
             />
           ) : (
@@ -338,37 +666,38 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               </h3>
             )}
             {trackName && (
-              <p
-                className="truncate text-sm font-semibold text-white sm:text-base md:text-lg"
-                title={trackName}
-              >
-                {trackName}
-              </p>
+              <ScrollingTrackName key={trackName} text={trackName} />
             )}
           </div>
           {showProgressBar && (
             <div className={cn("player-progress-slot w-full min-w-0 shrink-0", error && "player-progress-error")}>
-              <input
-                type="range"
-                min={0}
-                max={progressMax}
-                step={0.1}
-                value={currentTime}
-                onChange={handleSeek}
-                onPointerDown={onSeekPointerDown}
-                onPointerUp={onSeekPointerUp}
-                onPointerLeave={onSeekPointerUp}
-                className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:min-h-[16px] [&::-webkit-slider-thumb]:min-w-[16px] sm:[&::-webkit-slider-thumb]:h-2.5 sm:[&::-webkit-slider-thumb]:w-2.5")}
-                aria-label="Şarkı ilerlemesi"
-              />
-              <div className="player-progress-times mt-1 flex justify-between text-[10px] sm:text-xs text-white/50">
-                <span>{formatTime(currentTime)}</span>
-                <span>
-                  {Number.isFinite(duration) && duration > 0
-                    ? formatTime(duration)
-                    : "--:--"}
-                </span>
-              </div>
+              {isLive ? (
+                <LiveWaveform audioRef={audioRef} isPlaying={isPlaying} shared={isLive} />
+              ) : (
+                <>
+                  <input
+                    type="range"
+                    min={0}
+                    max={progressMax}
+                    step={0.1}
+                    value={progressValue}
+                    onChange={handleSeek}
+                    onPointerDown={onSeekPointerDown}
+                    onPointerUp={onSeekPointerUp}
+                    onPointerLeave={onSeekPointerUp}
+                    className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:min-h-[16px] [&::-webkit-slider-thumb]:min-w-[16px] sm:[&::-webkit-slider-thumb]:h-2.5 sm:[&::-webkit-slider-thumb]:w-2.5")}
+                    aria-label="Şarkı ilerlemesi"
+                  />
+                  <div className="player-progress-times mt-1 flex justify-between text-[10px] sm:text-xs text-white/50">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>
+                      {Number.isFinite(duration) && duration > 0
+                        ? formatTime(duration)
+                        : "--:--"}
+                    </span>
+                  </div>
+                </>
+              )}
               {error && (
                 <p className="player-error-message" role="alert">
                   {error}
@@ -376,8 +705,8 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               )}
             </div>
           )}
-          <div className="flex min-w-0 flex-1 flex-row flex-wrap items-center gap-1 sm:gap-1.5">
-            <div className="flex shrink-0 items-center gap-1.5">
+          <div ref={controlsRowRef} className="player-controls-row flex min-w-0 flex-1 flex-row flex-wrap items-center gap-1 sm:gap-1.5">
+            <div ref={primaryControlsRef} className="flex shrink-0 items-center gap-1.5">
               <button
                 type="button"
                 onClick={togglePlay}
@@ -418,12 +747,23 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             </div>
             <div
               ref={volumeRef}
-              className="flex min-w-0 items-center gap-1 sm:gap-1.5"
+              className="player-volume-control flex min-w-0 items-center gap-1 sm:gap-1.5"
+              data-open={volumeVisible ? "true" : "false"}
+              data-layout={volumeLayout}
               onMouseEnter={() => {
-                if (!window.matchMedia("(pointer: coarse)").matches) setVolumeOpen(true)
+                if (!window.matchMedia("(pointer: coarse)").matches) {
+                  cancelVolumeClose()
+                  setVolumeOpen(true)
+                }
               }}
               onMouseLeave={() => {
-                if (!window.matchMedia("(pointer: coarse)").matches) setVolumeOpen(false)
+                if (!window.matchMedia("(pointer: coarse)").matches) {
+                  cancelVolumeClose()
+                  volumeCloseTimerRef.current = window.setTimeout(() => {
+                    setVolumeOpen(false)
+                    volumeCloseTimerRef.current = null
+                  }, 240)
+                }
               }}
             >
               <button
@@ -445,9 +785,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               </button>
               <div
                 className={cn(
-                  "flex h-7 shrink-0 items-center overflow-hidden rounded-full bg-white/10 px-2 transition-all duration-200",
+                  "player-volume-panel flex h-7 min-w-0 items-center overflow-hidden rounded-full bg-white/10 px-2 transition-all duration-200",
                   volumeVisible
-                    ? "min-w-[6.5rem] shrink-0 flex-1 opacity-100 px-3"
+                    ? "flex-1 opacity-100 px-3"
                     : "w-0 min-w-0 flex-none px-0 opacity-0 pointer-events-none"
                 )}
               >
@@ -473,5 +813,17 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         )}
         </div>
       </div>
+      {persistenceKind && (
+        <label className="player-persist-toggle">
+          <input
+            type="checkbox"
+            checked={persistPlayback}
+            onChange={handlePersistPlaybackChange}
+          />
+          <span aria-hidden />
+          {persistenceKind === "live" ? "Sayfalar arasında yayını sürdür" : "Diğer sayfalarda çal"}
+        </label>
+      )}
+    </>
   )
 }

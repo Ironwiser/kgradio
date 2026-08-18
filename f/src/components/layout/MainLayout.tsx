@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 import { useLocation, useOutlet } from "react-router-dom"
 import { Header } from "./Header"
 import { Footer } from "./Footer"
+import { PersistentLivePlayer } from "@/components/player/PersistentLivePlayer"
 
 const routeOrder: Record<string, number> = {
   "/": 0,
@@ -78,6 +79,7 @@ export function MainLayout() {
         </div>
       </main>
       <Footer />
+      <PersistentLivePlayer pathname={location.pathname} />
     </div>
   )
 }
