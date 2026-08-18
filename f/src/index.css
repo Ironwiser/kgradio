@@ -2410,8 +2410,10 @@
 
 .editorial-playlists-content {
   display: flex;
+  align-self: center;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
   padding-top: clamp(28px, 4vh, 42px);
   padding-bottom: clamp(24px, 3.5vh, 38px);
 }
@@ -2628,6 +2630,7 @@
   }
   .editorial-page-header > p { max-width: 330px; font-size: 11px; }
   .editorial-page-content { padding: 30px 0 42px; }
+  .editorial-playlists-content { align-self: auto; }
   .editorial-player {
     --editorial-art: 116px;
     display: grid !important;
@@ -2804,7 +2807,7 @@
   border-color: #303030 !important;
   background:
     linear-gradient(90deg, rgba(255, 49, 49, .035), transparent 38%),
-    #050505 !important;
+    #0a0a0a !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
   transition: border-color .25s ease, box-shadow .25s ease;
 }
@@ -2862,7 +2865,7 @@
 
 .low-home-v2-player .player-progress-times {
   height: 11px;
-  margin-top: 5px !important;
+  margin-top: 9px !important;
   font-size: 9px !important;
   line-height: 11px !important;
   translate: none;
@@ -3407,4 +3410,315 @@
   .live-studio-history,
   .live-studio-side { padding: 26px 14px; }
   .live-studio-side { margin-top: 14px; }
+}
+
+/* Ana sayfa — broadcast console dilinden türetilen asimetrik marka vitrini */
+@media (min-width: 701px) {
+  .low-home-v2-shell {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: clamp(14px, 1.8vh, 20px);
+    padding: 0 clamp(24px, 3.2vw, 64px) clamp(18px, 2vw, 30px);
+  }
+
+  .low-home-v2-topline {
+    min-height: clamp(62px, 7.5vh, 74px);
+    padding: 0;
+    border: 0;
+    translate: none;
+  }
+
+  .low-home-v2-stage {
+    grid-template-columns: minmax(0, 1.18fr) minmax(390px, .82fr);
+    gap: clamp(14px, 1.7vw, 28px);
+    min-height: clamp(430px, 52vh, 520px);
+    border: 0;
+    translate: none;
+  }
+
+  .low-home-v2-mark {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: stretch;
+    justify-self: stretch;
+    justify-content: center;
+    padding: clamp(30px, 4vh, 48px) clamp(28px, 3.2vw, 56px);
+    border: 0;
+    background: #050505;
+  }
+
+  .low-home-v2-mark-lockup {
+    transform: scale(.78);
+    transform-origin: center center;
+  }
+
+  .low-home-v2-broadcast {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    justify-self: stretch;
+    display: flex;
+    width: auto;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(26px, 3.2vw, 46px);
+    border: 0;
+    background: #050505;
+    transform: none;
+    translate: none;
+  }
+
+  .low-home-v2-player { width: 100%; }
+
+  .low-home-v2-manifesto {
+    grid-template-columns: minmax(135px, .22fr) minmax(0, 1.78fr);
+    align-items: stretch;
+    gap: clamp(14px, 1.7vw, 28px);
+    min-height: clamp(112px, 16vh, 148px);
+    padding: 0;
+    border: 0;
+    translate: none;
+  }
+
+  .low-home-v2-manifesto > p {
+    align-self: end;
+    margin: 0;
+    padding: 0 0 16px;
+  }
+
+  .low-home-v2-manifesto h1 {
+    display: grid;
+    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+    align-items: stretch;
+    gap: clamp(12px, 1.2vw, 20px);
+    font-size: clamp(30px, 2.8vw, 54px);
+  }
+
+  .low-home-v2-manifesto h1 span {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: clamp(18px, 2vw, 30px);
+    border: 0;
+    background: #050505;
+  }
+}
+
+@media (max-width: 700px) {
+  .low-home-v2-shell { gap: 12px; }
+  .low-home-v2-stage { gap: 12px; }
+  .low-home-v2-mark,
+  .low-home-v2-broadcast { background: #050505; }
+  .low-home-v2-mark { padding: 22px 14px; border: 0; }
+  .low-home-v2-broadcast { padding: 18px 12px; border: 0; }
+  .low-home-v2-manifesto {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    padding-top: 0;
+  }
+  .low-home-v2-manifesto > p {
+    position: static;
+    width: auto;
+    margin: 0;
+    padding: 4px 0;
+  }
+  .low-home-v2-manifesto h1 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+  .low-home-v2-manifesto h1 span {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 12px;
+    border: 0;
+    background: #050505;
+    white-space: normal;
+  }
+}
+
+/* Route değişimlerinde içerik yatay bir sahne üzerinde yer değiştirir. */
+.route-transition-viewport {
+  overflow-x: clip;
+}
+
+.route-transition-current,
+.route-transition-stage,
+.route-transition-layer {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.route-transition-current,
+.route-transition-layer {
+  display: flex;
+  flex-direction: column;
+}
+
+.route-transition-stage {
+  display: grid;
+  width: 100%;
+  isolation: isolate;
+}
+
+.route-transition-layer {
+  grid-area: 1 / 1;
+  width: 100%;
+  will-change: transform;
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(.76, 0, .24, 1);
+  animation-fill-mode: both;
+}
+
+.route-transition-forward .route-transition-outgoing {
+  animation-name: route-slide-out-left;
+}
+
+.route-transition-forward .route-transition-incoming {
+  animation-name: route-slide-in-right;
+}
+
+.route-transition-backward .route-transition-outgoing {
+  animation-name: route-slide-out-right;
+}
+
+.route-transition-backward .route-transition-incoming {
+  animation-name: route-slide-in-left;
+}
+
+@keyframes route-slide-out-left {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-100%, 0, 0); }
+}
+
+@keyframes route-slide-in-right {
+  from { transform: translate3d(100%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes route-slide-out-right {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(100%, 0, 0); }
+}
+
+@keyframes route-slide-in-left {
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-transition-layer {
+    animation-duration: 1ms;
+  }
+}
+
+/* Tüm player örnekleri için ortak iç boşluk sistemi. */
+:is(.editorial-player, .low-home-v2-player) {
+  --shared-player-art: clamp(138px, 12vw, 180px);
+  --editorial-art: var(--shared-player-art) !important;
+  --v2-art: var(--shared-player-art) !important;
+  height: calc(var(--shared-player-art) + 2px) !important;
+  min-height: calc(var(--shared-player-art) + 2px) !important;
+  max-height: calc(var(--shared-player-art) + 2px) !important;
+  background:
+    linear-gradient(90deg, rgba(255, 49, 49, .035), transparent 38%),
+    #0a0a0a !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:first-of-type {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 49, 49, .09), transparent 35%),
+    linear-gradient(135deg, transparent 0 48%, rgba(255, 255, 255, .018) 48% 52%, transparent 52%),
+    #101010 !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:last-child {
+  min-height: 0 !important;
+  padding: 14px !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div {
+  display: grid !important;
+  grid-template-rows: 32px 40px 48px;
+  align-content: center !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  justify-content: stretch !important;
+  gap: 10px !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:first-child,
+:is(.editorial-player, .low-home-v2-player) .player-progress-slot,
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child {
+  align-self: stretch;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:first-child,
+:is(.editorial-player, .low-home-v2-player) .player-progress-slot {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:is(.editorial-player, .low-home-v2-player) h3 {
+  margin-bottom: 0 !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) .player-progress-slot {
+  margin: 0 !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) input[type="range"] + .player-progress-times,
+:is(.editorial-player, .low-home-v2-player) .player-progress-times {
+  height: 11px;
+  margin-top: 9px !important;
+  font-size: 9px !important;
+  line-height: 11px !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child {
+  gap: 8px !important;
+}
+
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child > div,
+:is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child > div > div {
+  gap: 8px !important;
+}
+
+@media (max-width: 700px) {
+  :is(.editorial-player, .low-home-v2-player) {
+    --shared-player-art: 116px;
+    height: 132px !important;
+    min-height: 132px !important;
+    max-height: 132px !important;
+  }
+
+  :is(.editorial-player, .low-home-v2-player) > div:last-child {
+    padding: 10px !important;
+  }
+
+  :is(.editorial-player, .low-home-v2-player) > div:last-child > div {
+    grid-template-rows: 24px 32px 38px;
+    gap: 6px !important;
+  }
+
+  :is(.editorial-player, .low-home-v2-player) input[type="range"] + .player-progress-times,
+  :is(.editorial-player, .low-home-v2-player) .player-progress-times {
+    margin-top: 7px !important;
+    font-size: 8px !important;
+  }
+
+  :is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child,
+  :is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child > div,
+  :is(.editorial-player, .low-home-v2-player) > div:last-child > div > div:last-child > div > div {
+    gap: 6px !important;
+  }
 }

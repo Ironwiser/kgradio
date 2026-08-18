@@ -101,7 +101,6 @@ export function Canli() {
                 </strong>
               </div>
               <dl>
-                <div><dt>SOURCE</dt><dd>{snapshot.isLive ? "LIVE" : "AUTODJ"}</dd></div>
                 <div><dt>STATION</dt><dd>{snapshot.stationName}</dd></div>
                 <div><dt>ACCESS</dt><dd>WORLDWIDE</dd></div>
               </dl>
