@@ -91,9 +91,11 @@ export function Hero() {
             </div>
 
             <div className="low-home-v2-mark" aria-label="LOWRadio">
-              <img className="low-home-v2-mark-logo" src="/images/low-logo.png" alt="LOWRadio" />
               <strong aria-hidden>LOW</strong>
-              <span aria-hidden>Radio</span>
+              <div className="low-home-v2-mark-lockup">
+                <img className="low-home-v2-mark-logo" src="/images/low-logo.png" alt="LOWRadio" />
+                <span aria-hidden>Radio</span>
+              </div>
             </div>
           </div>
 

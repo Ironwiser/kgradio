@@ -37,11 +37,19 @@ export function Kayit() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
-      <h1 className="font-brutal-heading text-2xl text-white mb-6">Kayıt Ol</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-1">
+    <section className="editorial-page editorial-auth-page">
+      <div className="editorial-page-shell editorial-auth-shell">
+        <header className="editorial-page-header">
+          <div className="editorial-page-index"><span /> ACCOUNT / 05</div>
+          <h1>Frekansa<br />Katıl</h1>
+          <p>LOWRadio hesabını oluştur; arşive ve yeni yayın deneyimlerine bağlan.</p>
+        </header>
+
+        <div className="editorial-page-content editorial-form-panel">
+          <p className="editorial-form-kicker">YENİ HESAP</p>
+          <form onSubmit={handleSubmit}>
+            <div className="editorial-field">
+          <label htmlFor="email">
             E-posta
           </label>
           <input
@@ -50,15 +58,12 @@ export function Kayit() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={cn(
-              "w-full rounded-md border border-border bg-[#111] px-3 py-2 text-white",
-              "focus:outline-none focus:ring-2 focus:ring-[#facc15]/50"
-            )}
+            className={cn("editorial-input")}
             placeholder="ornek@email.com"
           />
-        </div>
-        <div>
-          <label htmlFor="username" className="block text-sm font-medium text-white/80 mb-1">
+            </div>
+            <div className="editorial-field">
+          <label htmlFor="username">
             Kullanıcı adı
           </label>
           <input
@@ -67,15 +72,12 @@ export function Kayit() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className={cn(
-              "w-full rounded-md border border-border bg-[#111] px-3 py-2 text-white",
-              "focus:outline-none focus:ring-2 focus:ring-[#facc15]/50"
-            )}
+            className={cn("editorial-input")}
             placeholder="kullaniciadi"
           />
-        </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-1">
+            </div>
+            <div className="editorial-field">
+          <label htmlFor="password">
             Şifre
           </label>
           <input
@@ -85,28 +87,18 @@ export function Kayit() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className={cn(
-              "w-full rounded-md border border-border bg-[#111] px-3 py-2 text-white",
-              "focus:outline-none focus:ring-2 focus:ring-[#facc15]/50"
-            )}
+            className={cn("editorial-input")}
             placeholder="••••••••"
           />
+            </div>
+            {error && <p className="editorial-form-error" role="alert">{error}</p>}
+            <Button type="submit" disabled={loading} className="editorial-submit">
+              <span>{loading ? "Kaydediliyor…" : "Kayıt Ol"}</span><i aria-hidden>↗</i>
+            </Button>
+          </form>
+          <p className="editorial-form-switch">Zaten hesabınız var mı? <Link to="/giris">Giriş yap ↗</Link></p>
         </div>
-        {error && (
-          <p className="text-sm text-red-400" role="alert">
-            {error}
-          </p>
-        )}
-        <Button type="submit" disabled={loading} className="w-full bg-[#facc15] text-black hover:bg-[#fde047]">
-          {loading ? "Kaydediliyor…" : "Kayıt Ol"}
-        </Button>
-      </form>
-      <p className="mt-6 text-center text-white/70 text-sm">
-        Zaten hesabınız var mı?{" "}
-        <Link to="/giris" className="text-[#facc15] hover:underline">
-          Giriş yap
-        </Link>
-      </p>
-    </div>
+      </div>
+    </section>
   )
 }

@@ -1,8 +1,60 @@
 "use client"
 
 import * as React from "react"
-import { Play, Pause, Volume2, VolumeX, Music, SkipBack, SkipForward } from "lucide-react"
+import { Music } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+type GlyphProps = { className?: string }
+const PLAYER_ERROR_MESSAGE = "Yayın şu anda açılamıyor. Biraz sonra tekrar deneyin."
+
+function PlayGlyph({ className }: GlyphProps) {
+  return (
+    <svg viewBox="0 0 256 256" className={className} aria-hidden fill="currentColor">
+      <path d="M240 128a15.74 15.74 0 0 1-7.6 13.51l-144 88A16 16 0 0 1 64 216V40a16 16 0 0 1 24.4-13.51l144 88A15.74 15.74 0 0 1 240 128Z" />
+    </svg>
+  )
+}
+
+function PauseGlyph({ className }: GlyphProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden fill="none">
+      <rect x="6.5" y="5" width="3.5" height="14" rx="1.75" fill="currentColor" />
+      <rect x="14" y="5" width="3.5" height="14" rx="1.75" fill="currentColor" />
+      <path d="M12 7v10" stroke="currentColor" strokeWidth="1" opacity=".38" />
+    </svg>
+  )
+}
+
+function SignalGlyph({ muted = false, className }: GlyphProps & { muted?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden fill="none">
+      <circle cx="7" cy="12" r="2" fill="currentColor" />
+      {muted ? (
+        <>
+          <path d="m11 8 7 8M18 8l-7 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+        </>
+      ) : (
+        <>
+          <path d="M11 8.5c1.8 1.75 1.8 5.25 0 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M15 5.75c3.45 3.25 3.45 9.25 0 12.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+function StepGlyph({ direction, className }: GlyphProps & { direction: "back" | "forward" }) {
+  const transform = direction === "back" ? "translate(24 0) scale(-1 1)" : undefined
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden fill="none">
+      <g transform={transform}>
+        <path d="M7 5.5v13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="m10 7 7.5 5-7.5 5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+        <circle cx="18.5" cy="12" r="1" fill="currentColor" />
+      </g>
+    </svg>
+  )
+}
 
 export interface PlayerProps {
   /** Stream veya MP3 URL. Boşsa player hazır bekler. */
@@ -74,7 +126,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       setError(null)
       setIsLoading(true)
       audio.play().catch(() => {
-        setError("Çalınamadı. Stream URL'sini kontrol edin.")
+        setError(PLAYER_ERROR_MESSAGE)
         setIsPlaying(false)
       }).finally(() => setIsLoading(false))
     }
@@ -95,7 +147,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       setCurrentTime(0)
     }
     const onError = () => {
-      setError("Yayın yüklenemedi.")
+      setError(PLAYER_ERROR_MESSAGE)
       setIsPlaying(false)
     }
 
@@ -231,9 +283,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
 
   const controlIconClass = "h-3.5 w-3.5 shrink-0"
   const controlBtnClass =
-    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5 text-white/80 transition-colors touch-manipulation hover:bg-white/10 hover:text-white active:scale-95 sm:bg-transparent sm:text-white/70"
+    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5 text-white/80 transition-colors touch-manipulation hover:bg-white/10 hover:text-white sm:bg-transparent sm:text-white/70"
   const playBtnClass =
-    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/95 text-black transition-transform touch-manipulation hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 sm:bg-white"
+    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/95 text-black transition-colors touch-manipulation disabled:opacity-50 sm:bg-white"
 
   return (
     <div
@@ -295,30 +347,35 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             )}
           </div>
           {showProgressBar && (
-            <div className="w-full min-w-0 shrink-0">
-            <input
-              type="range"
-              min={0}
-              max={progressMax}
-              step={0.1}
-              value={currentTime}
-              onChange={handleSeek}
-              onPointerDown={onSeekPointerDown}
-              onPointerUp={onSeekPointerUp}
-              onPointerLeave={onSeekPointerUp}
-              className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:min-h-[16px] [&::-webkit-slider-thumb]:min-w-[16px] sm:[&::-webkit-slider-thumb]:h-2.5 sm:[&::-webkit-slider-thumb]:w-2.5")}
-              aria-label="Şarkı ilerlemesi"
-            />
-            <div className="mt-1 flex justify-between text-[10px] sm:text-xs text-white/50">
-              <span>{formatTime(currentTime)}</span>
-              <span>
-                {Number.isFinite(duration) && duration > 0
-                  ? formatTime(duration)
-                  : "--:--"}
-              </span>
+            <div className={cn("player-progress-slot w-full min-w-0 shrink-0", error && "player-progress-error")}>
+              <input
+                type="range"
+                min={0}
+                max={progressMax}
+                step={0.1}
+                value={currentTime}
+                onChange={handleSeek}
+                onPointerDown={onSeekPointerDown}
+                onPointerUp={onSeekPointerUp}
+                onPointerLeave={onSeekPointerUp}
+                className={cn(sliderTrackClass, "[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:min-h-[16px] [&::-webkit-slider-thumb]:min-w-[16px] sm:[&::-webkit-slider-thumb]:h-2.5 sm:[&::-webkit-slider-thumb]:w-2.5")}
+                aria-label="Şarkı ilerlemesi"
+              />
+              <div className="player-progress-times mt-1 flex justify-between text-[10px] sm:text-xs text-white/50">
+                <span>{formatTime(currentTime)}</span>
+                <span>
+                  {Number.isFinite(duration) && duration > 0
+                    ? formatTime(duration)
+                    : "--:--"}
+                </span>
+              </div>
+              {error && (
+                <p className="player-error-message" role="alert">
+                  {error}
+                </p>
+              )}
             </div>
-          </div>
-        )}
+          )}
           <div className="flex min-w-0 flex-1 flex-row flex-wrap items-center gap-1 sm:gap-1.5">
             <div className="flex shrink-0 items-center gap-1.5">
               <button
@@ -331,9 +388,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
                 {isLoading ? (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-black border-t-transparent" />
                 ) : isPlaying ? (
-                  <Pause className={controlIconClass} />
+                  <PauseGlyph className={controlIconClass} />
                 ) : (
-                  <Play className={cn(controlIconClass, "ml-px")} />
+                  <PlayGlyph className={cn(controlIconClass, "ml-px")} />
                 )}
               </button>
               {onPrevious && (
@@ -344,7 +401,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
                   aria-label="Önceki parça"
                   className={cn(controlBtnClass, "disabled:pointer-events-none disabled:opacity-50")}
                 >
-                  <SkipBack className={controlIconClass} />
+                  <StepGlyph direction="back" className={controlIconClass} />
                 </button>
               )}
               {onNext && (
@@ -355,7 +412,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
                   aria-label="Sonraki parça"
                   className={cn(controlBtnClass, "disabled:pointer-events-none disabled:opacity-50")}
                 >
-                  <SkipForward className={controlIconClass} />
+                  <StepGlyph direction="forward" className={controlIconClass} />
                 </button>
               )}
             </div>
@@ -381,9 +438,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
                 className={controlBtnClass}
               >
                 {isMuted || volume === 0 ? (
-                  <VolumeX className={controlIconClass} />
+                  <SignalGlyph muted className={controlIconClass} />
                 ) : (
-                  <Volume2 className={controlIconClass} />
+                  <SignalGlyph className={controlIconClass} />
                 )}
               </button>
               <div
@@ -409,11 +466,6 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             </div>
           </div>
         </div>
-        {error && (
-          <p className="mt-1 text-[10px] sm:text-xs text-red-400 shrink-0" role="alert">
-            {error}
-          </p>
-        )}
         {!hasSource && (
           <p className="mt-0.5 text-[10px] sm:text-xs text-white/50 shrink-0">
             Yayın başlatmak için bir stream URL'si ekleyin.

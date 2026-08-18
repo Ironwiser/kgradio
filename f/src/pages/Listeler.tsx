@@ -1,7 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Player } from "@/components/player/Player"
-import { Music } from "lucide-react"
 
 /** Backend'den MP3 stream; yoksa .env'deki VITE_STREAM_URL */
 const DEFAULT_STREAM_URL =
@@ -53,60 +52,62 @@ export function Listeler() {
   }
 
   return (
-    <section
-      className={cn(
-        "relative min-h-[calc(100vh-4rem)] px-4 py-6 sm:py-12",
-        "bg-[#111111]"
-      )}
-    >
-      <div className="container relative z-10 mx-auto flex max-w-3xl min-w-0 flex-col items-stretch px-0">
-        <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
-          LOWRadio · Çalma Listeleri
-        </h1>
-        <Player
-          src={playerSrc}
-          title="LOWRadio"
-          trackName={playerTrackName}
-          artworkUrl={playerArtworkUrl}
-          trackInfoUrl={selectedTrack ? undefined : "/api/audio/current"}
-          autoPlay={!!selectedTrack}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-          className="w-full max-w-full shrink-0 bg-[#111111]"
-        />
+    <section className="editorial-page editorial-playlists-page">
+      <div className="editorial-page-shell">
+        <header className="editorial-page-header">
+          <div className="editorial-page-index"><span /> ARCHIVE / 02</div>
+          <h1>Çalma<br />Listeleri</h1>
+          <p>Arşivden seçilmiş parçalar. Bir kaydı seç ve frekansa bağlan.</p>
+        </header>
 
-        <div className="mt-10 w-full shrink-0 rounded-lg border border-border bg-[#111111] p-5 sm:p-6">
-          <h2 className="mb-4 flex items-center gap-3 text-xl font-medium text-white/80">
-            <Music className="h-5 w-5" />
-            Çalma Listeleri
-          </h2>
+        <div className="editorial-page-content editorial-playlists-content">
+          <Player
+            src={playerSrc}
+            title="LOWRadio"
+            trackName={playerTrackName}
+            artworkUrl={playerArtworkUrl}
+            trackInfoUrl={selectedTrack ? undefined : "/api/audio/current"}
+            autoPlay={!!selectedTrack}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+            className="editorial-player"
+          />
+
+          <div className="editorial-track-panel">
+            <div className="editorial-track-heading">
+              <h2>Arşiv</h2>
+              <span>{String(trackList.length).padStart(2, "0")} KAYIT</span>
+            </div>
           {listLoading ? (
-            <p className="py-4 text-base text-white/60">Yükleniyor…</p>
+            <p className="editorial-track-state">Yükleniyor…</p>
           ) : trackList.length === 0 ? (
-            <p className="py-4 text-base text-white/60">Henüz parça yok.</p>
+            <p className="editorial-track-state">Henüz parça yok.</p>
           ) : (
-            <ul className="space-y-1">
-              {trackList.map((track) => (
+            <ul className="editorial-track-list">
+              {trackList.map((track, index) => (
                 <li key={track.url}>
                   <button
                     type="button"
                     onClick={() => setSelectedTrack(track)}
                     className={cn(
-                      "font-brutal-heading w-full px-3 py-2 text-left text-base min-h-[40px] flex items-center touch-manipulation transition-colors",
+                      "editorial-track-button",
                       selectedTrack?.url === track.url
-                        ? "playlist-track-active bg-[#facc15] text-black"
-                        : "bg-transparent text-white/70 hover:bg-white/[0.06] hover:text-white"
+                        ? "editorial-track-active"
+                        : ""
                     )}
                   >
-                    {track.displayName}
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{track.displayName}</strong>
+                    <i aria-hidden>↗</i>
                   </button>
                 </li>
               ))}
             </ul>
           )}
         </div>
+      </div>
       </div>
     </section>
   )
