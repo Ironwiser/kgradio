@@ -200,7 +200,9 @@ app.get("/api/animasyon/list", (req, res) => {
 if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST))
   // SPA fallback – JS/CSS 404'te index.html dönmesin (Safari'de beyaz ekran / "site açılmıyor" yapar)
-  app.get("*", (req, res, next) => {
+  // Express 5 / path-to-regexp wildcard'ları isimli olmalıdır.
+  // Süslü biçim kök yolu (/) da SPA fallback kapsamına alır.
+  app.get("/{*spaPath}", (req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next()
     const ext = path.extname(req.path)
     if (ext && ext !== ".html") return res.status(404).end()
