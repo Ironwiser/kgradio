@@ -30,7 +30,7 @@ function readPersistedPlayback() {
   return { live, archive, archiveSnapshot }
 }
 
-export function PersistentLivePlayer({ pathname }: { pathname: string }) {
+export function PersistentLivePlayer() {
   const isMobile = useMobileLayout()
   const [persisted, setPersisted] = useState(readPersistedPlayback)
   const popupRef = useRef<HTMLElement>(null)
@@ -49,8 +49,8 @@ export function PersistentLivePlayer({ pathname }: { pathname: string }) {
     }
   }, [])
 
-  const showLive = persisted.live && pathname !== "/" && pathname !== "/canli"
-  const showArchive = persisted.archive && !!persisted.archiveSnapshot && pathname !== "/calma-listeleri"
+  const showLive = persisted.live
+  const showArchive = persisted.archive && !!persisted.archiveSnapshot
   const mode = showLive ? "live" : showArchive ? "archive" : null
   if (isMobile || !mode) return null
 
@@ -122,6 +122,7 @@ export function PersistentLivePlayer({ pathname }: { pathname: string }) {
         {...playerProps}
         isLive={mode === "live"}
         allowPersistentPlayback={mode === "archive"}
+        isPersistentPopup
         className="editorial-player persistent-live-popup-player"
       />
     </aside>

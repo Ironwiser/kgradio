@@ -13,6 +13,7 @@ const PLAYBACK_PERSIST_KEYS: Record<PlaybackPersistKind, string> = {
 }
 const PLAYBACK_PERSIST_EVENT = "lowradio-playback-persist-change"
 const ARCHIVE_PLAYBACK_SNAPSHOT_KEY = "lowradio-archive-playback-snapshot"
+const EXTERNAL_PLAYBACK_EVENT = "lowradio-external-playback-start"
 const sharedLiveAudio = typeof Audio !== "undefined" ? new Audio() : null
 if (sharedLiveAudio) {
   sharedLiveAudio.crossOrigin = "anonymous"
@@ -273,6 +274,8 @@ export interface PlayerProps {
   isLive?: boolean
   /** Arşiv kaydının diğer sayfalarda popup player ile sürmesini sağlar. */
   allowPersistentPlayback?: boolean
+  /** Kalıcı ses örneğini popup içinde gösteren dahili player. */
+  isPersistentPopup?: boolean
   /** Önceki parçaya geç (liste varsa) */
   onPrevious?: () => void
   /** Sonraki parçaya geç (liste varsa) */
@@ -284,7 +287,7 @@ export interface PlayerProps {
   className?: string
 }
 
-export function Player({ src, title, trackName: trackNameProp, artworkUrl, trackInfoUrl, autoPlay, isLive = false, allowPersistentPlayback = false, onPrevious, onNext, canGoPrevious = true, canGoNext = true, className }: PlayerProps) {
+export function Player({ src, title, trackName: trackNameProp, artworkUrl, trackInfoUrl, autoPlay, isLive = false, allowPersistentPlayback = false, isPersistentPopup = false, onPrevious, onNext, canGoPrevious = true, canGoNext = true, className }: PlayerProps) {
   const localAudioRef = React.useRef<HTMLAudioElement>(null)
   const persistenceKind: PlaybackPersistKind | null = isLive ? "live" : allowPersistentPlayback ? "archive" : null
   const persistentAudio = persistenceKind === "live" ? sharedLiveAudio : persistenceKind === "archive" ? sharedArchiveAudio : null
@@ -344,12 +347,16 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
       // olarak durdur. Rota geçişinde yeni player eski cleanup'tan önce mount
       // olabildiği için yalnızca aktif örnek sayısına güvenmek otomatik yeniden
       // başlamaya yol açıyordu.
-      if (!getPlaybackPersistPreference(persistenceKind)) {
+      // Popup kapatıldığında aynı ortak audio sayfadaki player tarafından
+      // devralınır; popup örneğinin cleanup'ı yayını durdurmamalı.
+      const currentPath = window.location.pathname
+      const isLivePageHandoff = persistenceKind === "live" && (currentPath === "/" || currentPath === "/canli")
+      if (!getPlaybackPersistPreference(persistenceKind) && !isPersistentPopup && !isLivePageHandoff) {
         const audio = audioRef.current
         audio?.pause()
       }
     }
-  }, [audioRef, persistenceKind])
+  }, [audioRef, isPersistentPopup, persistenceKind])
 
   React.useEffect(() => {
     const controlsRow = controlsRowRef.current
@@ -430,6 +437,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         activePlayerAudio.pause()
       }
       activePlayerAudio = audio
+      window.dispatchEvent(new CustomEvent(EXTERNAL_PLAYBACK_EVENT, { detail: { source: "html-audio" } }))
       setIsPlaying(true)
       setError(null)
     }
@@ -473,6 +481,16 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   }, [audioRef])
 
   React.useEffect(() => {
+    const stopForExternalPlayer = (event: Event) => {
+      if ((event as CustomEvent<{ source?: string }>).detail?.source === "soundcloud") {
+        audioRef.current?.pause()
+      }
+    }
+    window.addEventListener(EXTERNAL_PLAYBACK_EVENT, stopForExternalPlayer)
+    return () => window.removeEventListener(EXTERNAL_PLAYBACK_EVENT, stopForExternalPlayer)
+  }, [audioRef])
+
+  React.useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
     audio.volume = isMuted ? 0 : volume
@@ -484,7 +502,9 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
 
     if (isLive) {
       const mayContinueAcrossPages = getPlaybackPersistPreference("live")
-      if (mayContinueAcrossPages && !audio.paused) {
+      const currentPath = window.location.pathname
+      const isLivePageHandoff = currentPath === "/" || currentPath === "/canli"
+      if ((mayContinueAcrossPages || isLivePageHandoff) && !audio.paused) {
         setIsPlaying(true)
         return
       }
@@ -573,6 +593,11 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
 
   /** Kapak URL'si değişince yükleme hatasını sıfırla */
   const resolvedArtworkUrl = artworkUrl ?? artworkFromApi
+  const displayedArtworkUrl = isLive
+    ? "/images/lowO.jpeg"
+    : resolvedArtworkUrl && !artworkLoadFailed
+      ? resolvedArtworkUrl
+      : null
   React.useEffect(() => {
     setArtworkLoadFailed(false)
   }, [resolvedArtworkUrl])
@@ -590,8 +615,10 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
     window.localStorage.setItem(PLAYBACK_PERSIST_KEYS[persistenceKind], String(enabled))
     if (enabled) {
       window.localStorage.setItem(PLAYBACK_PERSIST_KEYS[otherKind], "false")
+      window.localStorage.setItem("lowradio-soundcloud-popup-mode", "false")
       const otherAudio = otherKind === "live" ? sharedLiveAudio : sharedArchiveAudio
       otherAudio?.pause()
+      window.dispatchEvent(new CustomEvent(EXTERNAL_PLAYBACK_EVENT, { detail: { source: "html-audio" } }))
     }
     setPersistPlayback(enabled)
     window.dispatchEvent(new Event(PLAYBACK_PERSIST_EVENT))
@@ -644,6 +671,14 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   const playBtnClass =
     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/95 text-black transition-colors touch-manipulation disabled:opacity-50 sm:bg-white"
 
+  if (persistenceKind && persistPlayback && !isPersistentPopup) {
+    return <label className="player-persist-toggle player-popup-mode-placeholder">
+      <input type="checkbox" checked onChange={handlePersistPlaybackChange} />
+      <span aria-hidden />
+      PLAYER'I POPUP'A AL
+    </label>
+  }
+
   return (
     <>
     <div
@@ -663,16 +698,21 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         <div
           className={cn(
             "flex h-full w-full shrink-0 items-center justify-center overflow-hidden rounded-lg",
-            resolvedArtworkUrl && !artworkLoadFailed ? "bg-white/5" : "bg-white/[0.06]"
+            displayedArtworkUrl ? "bg-white/5" : "bg-white/[0.06]"
           )}
         >
-          {resolvedArtworkUrl && !artworkLoadFailed ? (
+          {displayedArtworkUrl ? (
             <img
-              key={resolvedArtworkUrl}
-              src={resolvedArtworkUrl}
+              key={displayedArtworkUrl}
+              src={displayedArtworkUrl}
               alt=""
-              className="player-track-transition h-full w-full object-cover"
-              onError={() => setArtworkLoadFailed(true)}
+              className={cn(
+                "player-track-transition h-full w-full object-cover",
+                isLive && "scale-125"
+              )}
+              onError={() => {
+                if (displayedArtworkUrl === resolvedArtworkUrl) setArtworkLoadFailed(true)
+              }}
             />
           ) : (
             <span className="relative flex items-center justify-center">
@@ -844,7 +884,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
         )}
         </div>
       </div>
-      {persistenceKind && (
+      {persistenceKind && !isPersistentPopup && (
         <label className="player-persist-toggle">
           <input
             type="checkbox"
@@ -852,7 +892,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
             onChange={handlePersistPlaybackChange}
           />
           <span aria-hidden />
-          {persistenceKind === "live" ? "Sayfalar arasında yayını sürdür" : "Diğer sayfalarda çal"}
+          PLAYER'I POPUP'A AL
         </label>
       )}
     </>

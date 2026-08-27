@@ -11,6 +11,8 @@ import cookieParser from "cookie-parser"
 import fs from "fs"
 import { parseFile } from "music-metadata"
 import userRoutes from "./routes/userRoutes.js"
+import soundcloudRoutes from "./routes/soundcloudRoutes.js"
+import { getCustomDbConnection } from "./db.js"
 const LFORADIO_ROOT = path.join(__dirname, "..")
 const MUSIC_DIR = path.join(__dirname, "music")
 const FRONTEND_DIST = path.join(__dirname, "..", "f", "dist")
@@ -26,6 +28,20 @@ app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 app.use(cookieParser())
 app.use("/api", userRoutes)
+app.use("/api", soundcloudRoutes)
+
+async function ensureApplicationSchema() {
+  let db
+  try {
+    db = await getCustomDbConnection("lforadio")
+    const schema = fs.readFileSync(path.join(__dirname, "sql", "Tables", "soundcloud_tables.sql"), "utf8")
+    await db.query(schema)
+    const adminEmail = process.env.INITIAL_ADMIN_EMAIL?.trim().toLowerCase()
+    if (adminEmail) await db.query("UPDATE users SET role='admin',updated_at=now() WHERE lower(email)=$1 AND role<>'admin'", [adminEmail])
+  } catch (error) {
+    console.error("Uygulama şeması hazırlanamadı:", error.message)
+  } finally { if (db) await db.end().catch(() => {}) }
+}
 
 /** Klasördeki .mp3 dosyalarını isme göre sıralı döner */
 function getMp3List(dir) {
@@ -210,6 +226,7 @@ if (process.env.NODE_ENV === "production" && fs.existsSync(FRONTEND_DIST)) {
   })
 }
 
+await ensureApplicationSchema()
 app.listen(PORT, () => {
   const base = `http://localhost:${PORT}`
   console.log(`LOW Radio backend ${base}`)

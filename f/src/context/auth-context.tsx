@@ -16,6 +16,7 @@ export type UserType = {
   id: number
   email: string
   username: string
+  role: "listener" | "dj" | "admin"
 }
 
 export type AuthContextType = {

@@ -13,6 +13,11 @@ function getRefreshSecret() {
   return s.trim()
 }
 
+function effectiveRole(user) {
+  const configured = process.env.INITIAL_ADMIN_EMAIL?.trim().toLowerCase()
+  return configured && user.email?.toLowerCase() === configured ? "admin" : (user.role || "listener")
+}
+
 export async function register(req, res) {
   const { email, username, password } = req.body || {}
   if (!email || !username || !password) {
@@ -52,7 +57,7 @@ export async function login(req, res) {
   try {
     db = await getCustomDbConnection("lforadio")
     const result = await db.query(
-      "SELECT id, email, username, password_hash FROM users WHERE email = $1",
+      "SELECT id, email, username, password_hash, role FROM users WHERE email = $1",
       [email]
     )
     await db.end()
@@ -64,13 +69,14 @@ export async function login(req, res) {
     if (!ok) {
       return res.status(401).json({ message: "E-posta veya şifre hatalı." })
     }
+    const role = effectiveRole(user)
     const accessToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role },
       getAccessSecret(),
       { expiresIn: "15m" }
     )
     const refreshToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role },
       getRefreshSecret(),
       { expiresIn: "30d" }
     )
@@ -80,7 +86,7 @@ export async function login(req, res) {
       sameSite: "strict",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
-    return res.json({ accessToken, username: user.username })
+    return res.json({ accessToken, username: user.username, role })
   } catch (err) {
     if (db) try { await db.end() } catch (_) {}
     console.error("Login error:", err)
@@ -96,14 +102,15 @@ export async function getProfile(req, res) {
   try {
     db = await getCustomDbConnection("lforadio")
     const result = await db.query(
-      "SELECT id, email, username FROM users WHERE email = $1",
+      "SELECT id, email, username, role FROM users WHERE email = $1",
       [req.user.email]
     )
     await db.end()
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Kullanıcı bulunamadı" })
     }
-    return res.json(result.rows[0])
+    const user = result.rows[0]
+    return res.json({ ...user, role: effectiveRole(user) })
   } catch (err) {
     if (db) try { await db.end() } catch (_) {}
     console.error("Profile error:", err)
@@ -128,19 +135,22 @@ export async function refresh(req, res) {
   try {
     const decoded = jwt.verify(refreshToken, getRefreshSecret())
     let db
+    let refreshedUser
     try {
       db = await getCustomDbConnection("lforadio")
-      const result = await db.query("SELECT id, email FROM users WHERE id = $1", [decoded.userId])
+      const result = await db.query("SELECT id, email, role FROM users WHERE id = $1", [decoded.userId])
       await db.end()
       if (result.rows.length === 0) {
         return res.status(401).json({ message: "Kullanıcı bulunamadı" })
       }
+      refreshedUser = result.rows[0]
     } catch (e) {
       if (db) try { await db.end() } catch (_) {}
       throw e
     }
+    const role = effectiveRole(refreshedUser)
     const newAccessToken = jwt.sign(
-      { userId: decoded.userId, email: decoded.email },
+      { userId: decoded.userId, email: decoded.email, role },
       getAccessSecret(),
       { expiresIn: "1d" }
     )

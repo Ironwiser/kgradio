@@ -6,6 +6,8 @@ import { Canli } from "@/pages/Canli"
 import { Kayit } from "@/pages/Kayit"
 import { Giris } from "@/pages/Giris"
 import { Hakkimizda } from "@/pages/Hakkimizda"
+import { Admin } from "@/pages/Admin"
+import { AdminRoute } from "@/components/auth/AdminRoute"
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,7 @@ const router = createBrowserRouter([
       { path: "hakkimizda", element: <Hakkimizda /> },
       { path: "kayit", element: <Kayit /> },
       { path: "giris", element: <Giris /> },
+      { element: <AdminRoute />, children: [{ path: "admin", element: <Admin /> }] },
     ],
   },
 ])

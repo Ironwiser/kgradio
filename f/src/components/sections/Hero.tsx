@@ -3,10 +3,6 @@ import { Player } from "@/components/player/Player"
 import { useAzuraCastNowPlaying } from "@/hooks/useAzuraCastNowPlaying"
 import { useMobileLayout } from "@/hooks/useMobileLayout"
 
-const heroConfig = {
-  subtitle: "NO ALGORITHMS · PURE TRANSMISSION",
-}
-
 const FALLBACK_VIDEO = "WhatsApp Video 2026-02-07 at 03.07.32.mp4"
 const HERO_BACKGROUND_VIDEO_ENABLED = false
 const LIVE_STREAM_URL =
@@ -78,7 +74,7 @@ export function Hero() {
 
       <div className="low-home-v2-shell">
         <div className="low-home-v2-topline">
-          <p>INDEPENDENT RADIO</p>
+          <div className="editorial-page-index"><span /> MAIN / 00</div>
           <p><span aria-hidden /> WORLDWIDE · 24/7</p>
         </div>
 
@@ -98,7 +94,6 @@ export function Hero() {
               )}
               <div className="low-home-v2-copy">
                 <p>Bağımsız sesleri, seçkileri ve canlı yayınları algoritmalardan uzak bir araya getiriyoruz.</p>
-                <p>{heroConfig.subtitle}</p>
               </div>
             </div>
 
@@ -112,10 +107,10 @@ export function Hero() {
           </div>
 
           <div className="low-home-v2-manifesto">
-            <p>OPEN FREQUENCY / CURATED SOUND</p>
+            <p>INDEPENDENT RADIO</p>
             <h1>
-              <span>Sesin peşindeyiz.</span>
-              <span>Frekansımız herkese açık.</span>
+              <span>NO ALGORITHMS · PURE TRANSMISSION</span>
+              <span>OPEN FREQUENCY /<br />CURATED SOUND</span>
             </h1>
           </div>
         </div>

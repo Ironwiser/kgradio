@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Menu, X, LogIn, UserPlus, ExternalLink, LogOut } from "lucide-react"
+import { Menu, X, LogIn, UserPlus, LogOut, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
 
@@ -30,10 +30,6 @@ export function Header() {
     document.addEventListener("click", handleClickOutside)
     return () => document.removeEventListener("click", handleClickOutside)
   }, [rightDropdownOpen])
-
-  const openDjPanel = () => {
-    window.open("https://radio.lowradio.com", "_blank", "noopener,noreferrer")
-  }
 
   return (
     <header className="low-site-header sticky top-0 z-50 w-full border-b border-[#1f1f1f] bg-black overflow-visible">
@@ -84,11 +80,6 @@ export function Header() {
             aria-expanded={rightDropdownOpen}
             aria-haspopup="true"
           >
-            {user ? (
-              <span className="font-brutal-heading shrink-0 leading-none" aria-hidden>
-                {user.username.charAt(0).toUpperCase()}
-              </span>
-            ) : null}
             <span className="truncate">{user ? user.username : "Giriş"}</span>
           </button>
 
@@ -110,6 +101,7 @@ export function Header() {
                     {user.username}
                   </p>
                 </div>
+                {user.role === "admin" && <Link to="/admin" role="menuitem" tabIndex={rightDropdownOpen ? 0 : -1} onClick={closeRightDropdown} className="auth-dropdown-item font-brutal-heading block text-left"><span className="auth-dropdown-item-inner text-white/90 hover:text-white"><Settings className="auth-dropdown-item-icon" aria-hidden />Yönetim</span></Link>}
                 <button
                   type="button"
                   role="menuitem"
@@ -149,19 +141,6 @@ export function Header() {
                     Kayıt Ol
                   </span>
                 </Link>
-                <div className="auth-dropdown-divider" aria-hidden />
-                <button
-                  type="button"
-                  role="menuitem"
-                  tabIndex={rightDropdownOpen ? 0 : -1}
-                  onClick={() => { closeRightDropdown(); openDjPanel() }}
-                  className="auth-dropdown-item font-brutal-heading block text-left"
-                >
-                  <span className="auth-dropdown-item-inner text-white/50 hover:text-white/85">
-                    <ExternalLink className="auth-dropdown-item-icon" aria-hidden />
-                    DJ Girişi
-                  </span>
-                </button>
               </>
             )}
           </div>
@@ -213,6 +192,7 @@ export function Header() {
             {user ? (
               <>
                 <span className="truncate px-3 font-brutal-heading text-lg md:text-[18px] text-white/80">{user.username}</span>
+                {user.role === "admin" && <Link to="/admin" onClick={closeMobile} className="nav-link-glitch font-brutal-heading mx-3 border border-border bg-white/[0.04] px-3 py-2.5 text-left text-lg md:text-[18px] text-white">Yönetim</Link>}
                 <button
                   type="button"
                   onClick={() => { closeMobile(); logout() }}
@@ -237,16 +217,6 @@ export function Header() {
                 >
                   <span>Kayıt Ol</span>
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMobile()
-                    openDjPanel()
-                  }}
-                  className="low-mobile-dj nav-link-glitch font-brutal-heading mx-3 inline-flex min-h-11 md:min-h-[44px] items-center px-3 md:px-[12px] py-2.5 md:py-[10px] text-lg md:text-[18px] text-white/60 touch-manipulation hover:text-white/90 text-left"
-                >
-                  <span>DJ Girişi</span>
-                </button>
               </>
             )}
           </div>

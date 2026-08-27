@@ -9,6 +9,256 @@
   font-display: swap;
 }
 
+/* Keep the SoundCloud iframe mounted while its visual surface changes. */
+.soundcloud-stable-widget-host {
+  position: fixed;
+  left: var(--soundcloud-host-left, 0);
+  top: var(--soundcloud-host-top, 0);
+  width: var(--soundcloud-host-width, 0);
+  height: var(--soundcloud-host-height, 0);
+  z-index: 90;
+  overflow: hidden;
+}
+
+.soundcloud-stable-widget-host[aria-hidden="true"] {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.soundcloud-stable-widget-host.is-popup { z-index: 91; }
+
+.soundcloud-stable-widget-host > .soundcloud-native-frame {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* SoundCloud catalog + administration */
+.soundcloud-page{background:#000;color:#eee;min-height:100%}.soundcloud-page-shell{width:min(1540px,100%);margin:auto;padding:34px 30px 80px}.soundcloud-page-header{display:grid;grid-template-columns:220px 1fr auto;align-items:end;gap:28px;padding-bottom:28px;border-bottom:1px solid #242424}.soundcloud-page-header h1{font-size:clamp(42px,6vw,104px);font-weight:400;letter-spacing:-.065em;line-height:.9;margin:0}.soundcloud-page-header p{color:#8b8b8b;margin:12px 0 0}.soundcloud-total,.soundcloud-section-label{font-size:10px;letter-spacing:.13em;color:#777}.soundcloud-now-playing{margin:28px 0 52px;padding:24px;background:#070707;border:1px solid #171717}.soundcloud-now-playing>p{color:#777}.soundcloud-current-meta{display:flex;align-items:center;gap:14px;margin:14px 0}.soundcloud-current-meta img,.soundcloud-current-meta>svg{width:54px;height:54px;object-fit:cover;background:#111;padding:8px}.soundcloud-current-meta div{display:flex;flex-direction:column;min-width:0}.soundcloud-current-meta strong{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.soundcloud-current-meta span{font-size:12px;color:#777}.soundcloud-widget-shell{margin-top:14px}.soundcloud-widget-surface,.soundcloud-native-frame{width:100%;height:166px;display:block}.soundcloud-native-frame{border:0}.soundcloud-persist-toggle{margin-top:12px;display:flex;justify-content:flex-end;align-items:center;gap:7px;color:#777;font-size:10px;font-weight:700;letter-spacing:.06em}.soundcloud-persist-toggle input{position:absolute;opacity:0}.soundcloud-persist-toggle span{width:22px;height:10px;border:1px solid #444;position:relative}.soundcloud-persist-toggle span:after{content:"";position:absolute;width:6px;height:6px;background:#555;left:1px;top:1px}.soundcloud-persist-toggle input:checked+span{border-color:#ff3038}.soundcloud-persist-toggle input:checked+span:after{background:#ff3038;left:13px}.soundcloud-section-heading{display:flex;justify-content:space-between;align-items:end;border-bottom:1px solid #222;padding-bottom:16px;margin-bottom:20px}.soundcloud-section-heading span{color:#ff3038;font-size:10px;letter-spacing:.12em}.soundcloud-section-heading h2{font-size:clamp(32px,4vw,66px);font-weight:400;letter-spacing:-.05em;margin:4px 0 0}.soundcloud-section-heading a,.soundcloud-artist-card a{display:flex;align-items:center;gap:5px;color:#888;font-size:10px}.soundcloud-section-heading svg,.soundcloud-artist-card a svg{width:12px}.soundcloud-catalog-section{margin-top:48px}.soundcloud-playlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.soundcloud-playlist-card{text-align:left;background:#080808;border:1px solid #161616;padding:12px;color:#eee;min-width:0}.soundcloud-card-art{aspect-ratio:1;display:grid;place-items:center;background:#111;position:relative;overflow:hidden}.soundcloud-card-art>img{width:100%;height:100%;object-fit:cover}.soundcloud-card-art>svg{width:40px;color:#444}.soundcloud-card-art>span{position:absolute;right:12px;bottom:12px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#ff3038;color:#000;opacity:0;transform:translateY(5px);transition:.2s}.soundcloud-playlist-card:hover .soundcloud-card-art>span{opacity:1;transform:none}.soundcloud-card-art>span svg{width:17px}.soundcloud-playlist-card small{display:block;color:#666;margin:12px 0 6px}.soundcloud-playlist-card strong,.soundcloud-playlist-card em{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.soundcloud-playlist-card em{font-style:normal;color:#777;font-size:12px;margin-top:3px}.soundcloud-artist-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.soundcloud-artist-card{border:1px solid #1c1c1c;background:#060606;padding:18px}.soundcloud-artist-card header{display:flex;gap:15px;border-bottom:1px solid #1b1b1b;padding-bottom:16px}.soundcloud-artist-card header>img,.soundcloud-artist-card header>svg{width:76px;height:76px;object-fit:cover;background:#111;padding:10px}.soundcloud-artist-card h3{font-size:24px;margin:0}.soundcloud-artist-card p{color:#777;font-size:12px;margin:5px 0}.soundcloud-artist-card ol{list-style:none;padding:0;margin:8px 0 0}.soundcloud-artist-card li button{width:100%;display:grid;grid-template-columns:28px 1fr 20px;gap:8px;align-items:center;text-align:left;padding:12px 4px;border-bottom:1px solid #131313}.soundcloud-artist-card li span{color:#555;font-size:10px}.soundcloud-artist-card li strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.soundcloud-artist-card li svg{width:14px;color:#ff3038}.soundcloud-empty,.soundcloud-state{padding:40px;color:#666;border:1px solid #151515}.soundcloud-error,.admin-error{color:#ff6468!important}.soundcloud-persistent-popup{position:fixed;right:18px;bottom:18px;width:min(440px,calc(100vw - 36px));z-index:80;background:#050505;border:1px solid #333;padding:14px;color:#eee;box-shadow:0 18px 60px #000}.soundcloud-persistent-popup .soundcloud-popup-label{color:#777;font-size:9px;margin-bottom:7px}.soundcloud-popup-label span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff3038;margin-right:6px}.soundcloud-persistent-popup>strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:10px}.soundcloud-persistent-popup .soundcloud-widget-surface,.soundcloud-persistent-popup .soundcloud-native-frame{height:120px}.soundcloud-persistent-popup>button{position:absolute;right:7px;top:5px;color:#888;font-size:20px}.admin-route-state{min-height:70vh;display:grid;place-items:center;background:#000;color:#888}.soundcloud-admin{min-height:100%;background:#030303;color:#eee;padding:36px max(24px,calc((100vw - 1400px)/2)) 80px}.soundcloud-admin>header{display:flex;justify-content:space-between;align-items:end;padding-bottom:24px;border-bottom:1px solid #292929}.soundcloud-admin>header span{font-size:10px;color:#ff3038;letter-spacing:.14em}.soundcloud-admin h1{font-size:clamp(38px,5vw,72px);margin:3px 0;letter-spacing:-.05em}.soundcloud-admin>header p{color:#666;margin:0}.soundcloud-admin>header a{display:flex;gap:6px;align-items:center;font-size:11px}.soundcloud-admin>header svg{width:13px}.admin-message{margin:16px 0;padding:12px;border-left:2px solid #ff3038;background:#111}.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.admin-panel{background:#080808;border:1px solid #1d1d1d;padding:20px;display:flex;flex-direction:column;gap:11px}.admin-panel-wide{grid-column:1/-1}.admin-panel h2{font-size:22px;margin:0}.admin-panel>p{color:#777;margin:0;font-size:13px}.admin-panel input,.admin-panel textarea,.admin-panel select{background:#020202;border:1px solid #333;color:#eee;padding:12px;min-width:0}.admin-panel textarea{min-height:75px;resize:vertical}.admin-panel>button,.admin-search>button{align-self:flex-start;background:#ff3038;color:#000;font-weight:800;padding:11px 15px;font-size:11px}.admin-panel>button:disabled{opacity:.3}.sc-link-preview{border:1px solid #303030;background:#101010;padding:9px;display:grid;grid-template-columns:56px 1fr 18px;align-items:center;gap:11px;text-align:left}.sc-link-preview>img,.sc-link-preview>span{width:56px;height:56px;object-fit:cover;background:#222;display:grid;place-items:center}.sc-link-preview div{display:flex;flex-direction:column;min-width:0}.sc-link-preview small{color:#ff3038;font-size:8px}.sc-link-preview strong,.sc-link-preview em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-link-preview em{font-size:11px;color:#777;font-style:normal}.sc-link-preview>svg{width:14px}.admin-inline,.admin-search{display:flex;gap:8px}.admin-search input{flex:1}.admin-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-results>button{min-width:0}.admin-content-list>div{display:grid;grid-template-columns:45px 1fr auto 36px;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1a1a1a}.admin-content-list img,.admin-content-list>div>span{width:45px;height:45px;object-fit:cover;background:#171717;display:grid;place-items:center}.admin-content-list div>div{display:flex;flex-direction:column;min-width:0}.admin-content-list strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-content-list small{color:#666}.admin-content-list label{font-size:10px}.admin-content-list button svg{width:16px;color:#ff6065}
+@media(max-width:800px){.soundcloud-page-shell{padding:18px 12px 50px}.soundcloud-page-header{grid-template-columns:1fr;gap:10px}.soundcloud-page-header .editorial-page-index{order:-1}.soundcloud-total{display:none}.soundcloud-now-playing{padding:10px;margin:14px 0 30px}.soundcloud-widget-surface,.soundcloud-native-frame{height:120px}.soundcloud-persist-toggle{display:none}.soundcloud-playlist-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.soundcloud-artist-grid{grid-template-columns:1fr}.soundcloud-artist-card{padding:12px}.soundcloud-persistent-popup{display:none}.soundcloud-admin{padding:20px 12px 60px}.soundcloud-admin>header{align-items:start}.admin-grid{grid-template-columns:1fr}.admin-panel-wide{grid-column:auto}.admin-results{grid-template-columns:1fr}.admin-inline,.admin-search{flex-direction:column}.admin-content-list>div{grid-template-columns:40px 1fr 32px}.admin-content-list label{display:none}}
+
+.soundcloud-editorial-page{background:#000;color:#eee;min-height:100%}.soundcloud-editorial-shell{display:grid;grid-template-columns:minmax(300px,42.5%) minmax(0,57.5%);min-height:calc(100dvh - 72px)}.soundcloud-editorial-intro{position:relative;display:flex;min-height:100%;flex-direction:column;justify-content:space-between;padding:34px 36px 48px;border-right:1px solid #242424}.soundcloud-editorial-intro h1{margin:0;font-size:clamp(62px,7.2vw,138px);font-weight:100;line-height:.78;letter-spacing:-.075em}.soundcloud-editorial-intro p{max-width:410px;margin:26px 0 0;color:#8a8a8a;font-size:14px}.soundcloud-editorial-intro>span{font-size:9px;letter-spacing:.12em;color:#686868}.soundcloud-editorial-main{min-width:0;padding:118px 42px 64px}.soundcloud-editorial-player{padding:18px;background:#070707;border:1px solid #1d1d1d}.soundcloud-editorial-player>header,.soundcloud-editorial-list>header,.soundcloud-editorial-artists>header{display:flex;align-items:center;justify-content:space-between;color:#707070;font-size:9px;letter-spacing:.12em}.soundcloud-editorial-player>p{margin:22px 0;color:#6d6d6d}.soundcloud-editorial-current{display:flex;min-width:0;align-items:center;gap:12px;margin:14px 0}.soundcloud-editorial-current img{width:62px;height:62px;object-fit:cover}.soundcloud-editorial-current>div{display:flex;min-width:0;flex-direction:column}.soundcloud-editorial-current small{color:#ff3038;font-size:8px}.soundcloud-editorial-current strong{overflow:hidden;font-size:17px;text-overflow:ellipsis;white-space:nowrap}.soundcloud-editorial-current span{color:#777;font-size:11px}.soundcloud-editorial-player .soundcloud-widget-surface,.soundcloud-editorial-player .soundcloud-native-frame{height:120px}.soundcloud-editorial-list,.soundcloud-editorial-artists{margin-top:30px}.soundcloud-editorial-list>header,.soundcloud-editorial-artists>header{padding:0 0 13px;border-bottom:1px solid #2a2a2a}.soundcloud-editorial-list h2,.soundcloud-editorial-artists h2{margin:0;color:#eee;font-size:34px;font-weight:100;letter-spacing:-.045em}.soundcloud-editorial-list a,.soundcloud-editorial-artist-name a{display:flex;align-items:center;gap:5px;color:#696969;font-size:9px}.soundcloud-editorial-list a svg,.soundcloud-editorial-artist-name a svg{width:11px}.soundcloud-editorial-list>p,.soundcloud-editorial-artists>p,.soundcloud-editorial-state{margin:0;padding:24px 0;color:#666;font-size:12px}.soundcloud-editorial-list ol,.soundcloud-editorial-artists ol{margin:0;padding:0;list-style:none}.soundcloud-editorial-list li button{display:grid;width:100%;grid-template-columns:34px minmax(0,1fr) auto 18px;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #181818;text-align:left}.soundcloud-editorial-list li button>span,.soundcloud-editorial-artists li button>span{color:#555;font-size:9px}.soundcloud-editorial-list li button>div{display:flex;min-width:0;flex-direction:column}.soundcloud-editorial-list strong,.soundcloud-editorial-artists li strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.soundcloud-editorial-list small{color:#676767;font-size:10px}.soundcloud-editorial-list em{color:#555;font-size:8px;font-style:normal;text-transform:uppercase}.soundcloud-editorial-list li svg,.soundcloud-editorial-artists li svg{width:12px;color:#777}.soundcloud-editorial-list li button:hover svg,.soundcloud-editorial-artists li button:hover svg{color:#ff3038}.soundcloud-editorial-artists>article{display:grid;grid-template-columns:190px minmax(0,1fr);border-bottom:1px solid #282828}.soundcloud-editorial-artist-name{display:flex;align-items:center;gap:10px;padding:14px 12px 14px 0;border-right:1px solid #1d1d1d}.soundcloud-editorial-artist-name img{width:44px;height:44px;object-fit:cover}.soundcloud-editorial-artist-name>div{min-width:0}.soundcloud-editorial-artist-name h3{overflow:hidden;margin:0;font-size:16px;text-overflow:ellipsis;white-space:nowrap}.soundcloud-editorial-artists article>ol{padding-left:14px}.soundcloud-editorial-artists li button{display:grid;width:100%;grid-template-columns:28px minmax(0,1fr) 18px;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid #141414;text-align:left}.soundcloud-editorial-artists li:last-child button{border-bottom:0}
+@media(max-width:900px){.soundcloud-editorial-shell{display:block;min-height:0}.soundcloud-editorial-intro{min-height:260px;padding:22px 18px 28px;border-right:0;border-bottom:1px solid #242424}.soundcloud-editorial-intro h1{font-size:clamp(58px,16vw,92px);line-height:.82}.soundcloud-editorial-intro p{margin-top:18px}.soundcloud-editorial-main{padding:18px 12px 48px}.soundcloud-editorial-player{padding:10px}.soundcloud-editorial-player .soundcloud-widget-surface,.soundcloud-editorial-player .soundcloud-native-frame{height:120px}.soundcloud-editorial-artists>article{display:block}.soundcloud-editorial-artist-name{border-right:0;border-bottom:1px solid #181818}.soundcloud-editorial-artists article>ol{padding-left:0}.soundcloud-editorial-list h2,.soundcloud-editorial-artists h2{font-size:28px}}
+
+/* Final two-column SoundCloud library */
+.soundcloud-editorial-page{width:100%;max-width:100%}.soundcloud-editorial-shell{display:block;width:min(1480px,100%);min-height:calc(100dvh - 72px);margin:0 auto;padding:32px 30px 64px}.soundcloud-editorial-top{display:grid;grid-template-columns:180px minmax(0,1fr) auto;align-items:end;gap:24px;padding-bottom:22px;border-bottom:1px solid #262626}.soundcloud-editorial-top h1{margin:0;font-size:clamp(46px,5.4vw,92px);font-weight:100;line-height:.85;letter-spacing:-.065em}.soundcloud-editorial-top p{margin:12px 0 0;color:#777;font-size:12px}.soundcloud-editorial-top>span{color:#666;font-size:9px;letter-spacing:.12em}.soundcloud-editorial-main{width:100%;min-width:0;padding:26px 0 0}.soundcloud-editorial-player{width:100%;max-width:none}.soundcloud-editorial-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:30px}.soundcloud-editorial-columns>.soundcloud-editorial-list{min-width:0;margin:0;padding:0 18px 20px;border:1px solid #1f1f1f;background:#050505}.soundcloud-editorial-columns>.soundcloud-editorial-list>header{height:72px;padding:0;border-bottom:1px solid #292929}.soundcloud-editorial-columns>.soundcloud-editorial-list h2{font-size:32px}.soundcloud-column-note{height:44px;margin:0!important;padding:14px 0!important;border-bottom:1px solid #171717!important;color:#606060!important;font-size:10px!important}.soundcloud-list-empty{margin:0!important;padding:30px 0!important;color:#555!important}.soundcloud-editorial-columns .soundcloud-editorial-list li button{grid-template-columns:30px 42px minmax(0,1fr) 18px;min-height:66px;padding:9px 0}.soundcloud-editorial-columns .soundcloud-editorial-list li button>img{width:42px;height:42px;object-fit:cover;background:#111}.soundcloud-editorial-columns .soundcloud-editorial-list li button>div{min-width:0}.soundcloud-editorial-columns .soundcloud-editorial-list li button strong{font-size:13px}.soundcloud-editorial-columns .soundcloud-editorial-list li button small{font-size:9px}.soundcloud-editorial-columns .soundcloud-editorial-list li button>svg{justify-self:end}.soundcloud-editorial-picks>header>span{color:#666;font-size:9px;letter-spacing:.1em}
+@media(max-width:760px){.soundcloud-editorial-shell{padding:16px 12px 44px}.soundcloud-editorial-top{grid-template-columns:1fr;gap:9px}.soundcloud-editorial-top .editorial-page-index{order:-1}.soundcloud-editorial-top h1{font-size:52px}.soundcloud-editorial-top>span{display:none}.soundcloud-editorial-main{padding-top:14px}.soundcloud-editorial-columns{grid-template-columns:1fr;gap:14px;margin-top:16px}.soundcloud-editorial-columns>.soundcloud-editorial-list{padding:0 11px 12px}.soundcloud-editorial-columns>.soundcloud-editorial-list>header{height:58px}.soundcloud-editorial-columns>.soundcloud-editorial-list h2{font-size:27px}}
+.soundcloud-row-art{display:grid;width:42px;height:42px;place-items:center;background:#111;color:#444;font-size:9px;font-style:normal}
+.soundcloud-editorial-shell,.soundcloud-editorial-main,.soundcloud-editorial-columns{box-sizing:border-box;max-width:100%}
+.soundcloud-editorial-page{width:100%;max-width:100%}.soundcloud-editorial-shell{box-sizing:border-box;width:calc(100% - 60px);max-width:1480px;margin-inline:auto;padding:32px 0 64px}.soundcloud-editorial-main,.soundcloud-editorial-columns,.soundcloud-widget-shell,.soundcloud-widget-surface,.soundcloud-native-frame{box-sizing:border-box;width:100%;max-width:100%;min-width:0}.soundcloud-editorial-columns>*{min-width:0}
+@media(max-width:760px){.soundcloud-editorial-shell{width:calc(100% - 24px);padding:16px 0 44px}}
+
+/* SoundCloud tracks play inside the row they belong to. */
+.soundcloud-editorial-main { padding-top: 22px; }
+.soundcloud-editorial-columns { margin-top: 0; }
+.soundcloud-editorial-list li { min-width: 0; }
+.soundcloud-editorial-list li.soundcloud-track-active {
+  background: #080808;
+  border-bottom: 1px solid #292929;
+}
+.soundcloud-editorial-list li.soundcloud-track-active > button {
+  border-bottom-color: #292929;
+}
+.soundcloud-editorial-list li.soundcloud-track-active > button > svg {
+  color: #ff3038;
+}
+.soundcloud-inline-player {
+  margin: 0;
+  padding: 10px 0 12px;
+}
+.soundcloud-inline-player .soundcloud-widget-surface,
+.soundcloud-inline-player .soundcloud-native-frame {
+  height: 166px;
+}
+.soundcloud-inline-player .soundcloud-persist-toggle {
+  margin-top: 8px;
+}
+.soundcloud-persistent-popup .soundcloud-widget-surface,
+.soundcloud-persistent-popup .soundcloud-native-frame {
+  height: 166px;
+}
+.soundcloud-popup-title-window {
+  width: calc(100% - 22px);
+  margin-bottom: 10px;
+  overflow: hidden;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.12;
+  white-space: nowrap;
+}
+.soundcloud-persistent-popup .soundcloud-popup-label {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.soundcloud-persistent-popup .soundcloud-popup-label:active {
+  cursor: grabbing;
+}
+.soundcloud-popup-title-track {
+  display: flex;
+  width: max-content;
+  gap: 48px;
+  white-space: nowrap;
+  will-change: transform;
+}
+.soundcloud-popup-title-track > span {
+  flex: none;
+}
+.soundcloud-popup-title-window[data-overflow="true"] .soundcloud-popup-title-track {
+  animation: soundcloud-popup-title-pan 18s linear infinite;
+}
+@keyframes soundcloud-popup-title-pan {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 24px)); }
+}
+@media(max-width:760px){
+  .soundcloud-editorial-main { padding-top: 14px; }
+  .soundcloud-inline-player { padding: 8px 0 10px; }
+  .soundcloud-inline-player .soundcloud-widget-surface,
+  .soundcloud-inline-player .soundcloud-native-frame { height: 150px; }
+}
+
+/* Playlists — shared LOWRadio editorial page language. */
+.soundcloud-editorial-page {
+  min-height: 100%;
+  background: #000;
+}
+
+.soundcloud-editorial-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 clamp(24px, 3.2vw, 64px) clamp(34px, 5vh, 64px);
+  border-bottom: 1px solid #292929;
+}
+
+.soundcloud-editorial-top {
+  grid-template-columns: minmax(160px, 1fr) minmax(0, 2.2fr) auto;
+  min-height: clamp(180px, 25vh, 260px);
+  align-items: center;
+  gap: clamp(24px, 4vw, 72px);
+  padding: clamp(38px, 6vh, 72px) 0 clamp(28px, 4vh, 48px);
+  border-bottom: 1px solid #292929;
+}
+
+.soundcloud-editorial-top h1 {
+  color: #f3f3f3;
+  font-size: clamp(58px, 7vw, 126px);
+  font-weight: 300;
+  line-height: .78;
+  letter-spacing: -.075em;
+}
+
+.soundcloud-editorial-top > span {
+  align-self: start;
+  margin-top: 4px;
+  color: #777;
+}
+
+@media (min-width: 761px) {
+  .soundcloud-editorial-top {
+    position: relative;
+  }
+
+  .editorial-page.soundcloud-editorial-page .soundcloud-editorial-top .editorial-page-index {
+    position: static;
+    align-self: start;
+    margin: 0;
+    translate: 0 -24px;
+  }
+}
+
+.soundcloud-editorial-main {
+  padding-top: 0;
+}
+
+.soundcloud-editorial-columns {
+  gap: 0;
+}
+
+.soundcloud-editorial-columns > .soundcloud-editorial-list {
+  margin: 0;
+  padding: clamp(26px, 4vh, 48px) clamp(22px, 3vw, 52px) clamp(24px, 4vh, 48px) 0;
+  border: 0;
+  background: transparent;
+}
+
+.soundcloud-editorial-columns > .soundcloud-editorial-list + .soundcloud-editorial-list {
+  padding-right: 0;
+  padding-left: clamp(22px, 3vw, 52px);
+  border-left: 1px solid #292929;
+}
+
+.soundcloud-editorial-columns > .soundcloud-editorial-list > header {
+  height: auto;
+  min-height: 62px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #292929;
+}
+
+.soundcloud-editorial-columns > .soundcloud-editorial-list h2 {
+  color: #f1f1f1;
+  font-size: clamp(34px, 3.2vw, 58px);
+  font-weight: 300;
+  line-height: .9;
+  letter-spacing: -.055em;
+}
+
+.soundcloud-editorial-columns .soundcloud-editorial-list li button {
+  min-height: 72px;
+  padding: 10px 4px;
+  border-bottom-color: #1b1b1b;
+  transition: background-color .18s ease, color .18s ease;
+}
+
+.soundcloud-editorial-columns .soundcloud-editorial-list li button:hover {
+  background: #080808;
+}
+
+.soundcloud-editorial-columns .soundcloud-editorial-list li button strong {
+  color: #e8e8e8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.soundcloud-editorial-columns .soundcloud-editorial-list li button small {
+  margin-top: 3px;
+  color: #737373;
+}
+
+.soundcloud-editorial-list li.soundcloud-track-active {
+  background: #070707;
+}
+
+@media(max-width:760px){
+  .soundcloud-editorial-shell {
+    width: 100%;
+    padding: 0 12px 36px;
+  }
+  .soundcloud-editorial-top {
+    display: flex;
+    min-height: 150px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 24px 0 22px;
+  }
+  .soundcloud-editorial-top > div:nth-child(2) { align-self: flex-end; }
+  .soundcloud-editorial-top h1 { font-size: clamp(46px, 14vw, 66px); }
+  .soundcloud-editorial-columns { display: block; }
+  .soundcloud-editorial-columns > .soundcloud-editorial-list,
+  .soundcloud-editorial-columns > .soundcloud-editorial-list + .soundcloud-editorial-list {
+    padding: 24px 0 18px;
+    border-left: 0;
+  }
+  .soundcloud-editorial-columns > .soundcloud-editorial-list + .soundcloud-editorial-list {
+    border-top: 1px solid #292929;
+  }
+  .soundcloud-editorial-columns > .soundcloud-editorial-list > header { min-height: 52px; }
+  .soundcloud-editorial-columns > .soundcloud-editorial-list h2 { font-size: 34px; }
+  .soundcloud-editorial-columns .soundcloud-editorial-list li button { min-height: 64px; }
+}
+
 /* Neue Haas Display Black: public/fonts/ */
 @font-face {
   font-family: "Neue Haas Display";
@@ -2901,12 +3151,44 @@
 .auth-dropdown-panel {
   width: 220px !important;
   min-width: 220px !important;
+  overflow: hidden !important;
   margin-top: 0 !important;
   padding: 0 !important;
   border: 1px solid #292929 !important;
   border-radius: 0 !important;
   background: #000 !important;
   box-shadow: none !important;
+}
+
+.auth-dropdown-user {
+  min-width: 0;
+  height: 48px;
+  gap: 9px !important;
+  overflow: hidden;
+  padding: 0 14px !important;
+  border-bottom: 1px solid #292929;
+}
+
+.auth-dropdown-user-avatar {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+.auth-dropdown-user > p {
+  min-width: 0;
+  max-width: 150px;
+  overflow: hidden;
+  color: #aaa !important;
+  font-family: "Inter Tight", "Segoe UI", sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: .08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .auth-dropdown-item {
@@ -3757,6 +4039,7 @@
     padding: clamp(18px, 2vw, 30px);
     border: 0;
     background: #050505;
+    white-space: normal;
   }
 }
 
@@ -4341,6 +4624,32 @@
   .persistent-live-popup .player-persist-toggle {
     margin-top: 8px;
   }
+}
+
+/* Canlı popupı SoundCloud popupının dış ölçüleriyle eşleştir. */
+.persistent-live-popup {
+  right: 18px;
+  bottom: 18px;
+  width: min(440px, calc(100vw - 36px));
+  min-height: 252px;
+  padding: 14px;
+  border-color: #333;
+}
+
+.persistent-live-popup > header {
+  height: 31px;
+}
+
+.persistent-live-popup .persistent-live-popup-player {
+  --editorial-art: 166px !important;
+  height: 190px !important;
+  min-height: 190px !important;
+  max-height: 190px !important;
+}
+
+.persistent-live-popup .persistent-live-popup-player > div:last-child > div {
+  grid-template-rows: 34px 48px 50px !important;
+  gap: 9px !important;
 }
 
 @media (max-width: 1100px) {

@@ -42,7 +42,7 @@ export function Giris() {
         const userData = await profileRes.json()
         setUser(userData)
       } else {
-        setUser({ id: 0, email: email, username: data.username ?? "" })
+        setUser({ id: 0, email: email, username: data.username ?? "", role: data.role ?? "listener" })
       }
       navigate("/", { replace: true })
     } catch {

@@ -5,6 +5,7 @@ import { Header } from "./Header"
 import { Footer } from "./Footer"
 import { PersistentLivePlayer } from "@/components/player/PersistentLivePlayer"
 import { MobileLiveDock } from "@/components/player/MobileLiveDock"
+import { SoundCloudProvider } from "@/context/soundcloud-context"
 
 const routeOrder: Record<string, number> = {
   "/": 0,
@@ -14,6 +15,7 @@ const routeOrder: Record<string, number> = {
   "/rasgele": 3,
   "/giris": 4,
   "/kayit": 4,
+  "/admin": 4,
 }
 
 type RouteFrame = {
@@ -59,29 +61,31 @@ export function MainLayout() {
   }, [])
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-background">
-      <Header />
-      <MobileLiveDock />
-      <main className="route-transition-viewport flex min-h-0 w-full min-w-0 flex-1 flex-col">
-        <div className={`route-transition-stage${transition ? ` route-transition-${transition.direction}` : ""}`}>
-          {transition ? (
-            <>
-            <div key={transition.from.path} className="route-transition-layer route-transition-outgoing" aria-hidden="true">
-              {transition.from.content}
-            </div>
-            <div key={transition.to.path} className="route-transition-layer route-transition-incoming">
-              {transition.to.content}
-            </div>
-            </>
-          ) : (
-            <div key={displayed.path} className="route-transition-layer route-transition-settled">
-              {displayed.content}
-            </div>
-          )}
-        </div>
-      </main>
-      <Footer />
-      <PersistentLivePlayer pathname={location.pathname} />
-    </div>
+    <SoundCloudProvider pathname={location.pathname}>
+      <div className="flex min-h-[100dvh] flex-col bg-background">
+        <Header />
+        <MobileLiveDock />
+        <main className="route-transition-viewport flex min-h-0 w-full min-w-0 flex-1 flex-col">
+          <div className={`route-transition-stage${transition ? ` route-transition-${transition.direction}` : ""}`}>
+            {transition ? (
+              <>
+              <div key={transition.from.path} className="route-transition-layer route-transition-outgoing" aria-hidden="true">
+                {transition.from.content}
+              </div>
+              <div key={transition.to.path} className="route-transition-layer route-transition-incoming">
+                {transition.to.content}
+              </div>
+              </>
+            ) : (
+              <div key={displayed.path} className="route-transition-layer route-transition-settled">
+                {displayed.content}
+              </div>
+            )}
+          </div>
+        </main>
+        <Footer />
+        <PersistentLivePlayer />
+      </div>
+    </SoundCloudProvider>
   )
 }
