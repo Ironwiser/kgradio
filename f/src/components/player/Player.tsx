@@ -594,7 +594,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
   /** Kapak URL'si değişince yükleme hatasını sıfırla */
   const resolvedArtworkUrl = artworkUrl ?? artworkFromApi
   const displayedArtworkUrl = isLive
-    ? "/images/lowO.jpeg"
+    ? "/images/lowO-vinyl.png"
     : resolvedArtworkUrl && !artworkLoadFailed
       ? resolvedArtworkUrl
       : null
@@ -706,10 +706,7 @@ export function Player({ src, title, trackName: trackNameProp, artworkUrl, track
               key={displayedArtworkUrl}
               src={displayedArtworkUrl}
               alt=""
-              className={cn(
-                "player-track-transition h-full w-full object-cover",
-                isLive && "scale-125"
-              )}
+              className="player-track-transition h-full w-full object-cover"
               onError={() => {
                 if (displayedArtworkUrl === resolvedArtworkUrl) setArtworkLoadFailed(true)
               }}

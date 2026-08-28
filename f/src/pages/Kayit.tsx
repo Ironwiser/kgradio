@@ -42,7 +42,6 @@ export function Kayit() {
         <header className="editorial-page-header">
           <div className="editorial-page-index"><span /> ACCOUNT / 05</div>
           <h1>Frekansa<br />Katıl</h1>
-          <p>LOWRadio hesabını oluştur; arşive ve yeni yayın deneyimlerine bağlan.</p>
         </header>
 
         <div className="editorial-page-content editorial-form-panel">

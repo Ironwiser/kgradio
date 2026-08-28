@@ -4,6 +4,96 @@ import { getCustomDbConnection } from "../db.js"
 
 const router = express.Router()
 let tokenCache = null
+let profileTracksCache = null
+const PROFILE_TRACKS_CACHE_MS = 5 * 60 * 1000
+
+function decodeXml(value = "") {
+  return value
+    .replace(/^<!\[CDATA\[([\s\S]*)\]\]>$/i, "$1")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .trim()
+}
+
+function xmlText(block, tag) {
+  const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const match = block.match(new RegExp(`<${escapedTag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${escapedTag}>`, "i"))
+  return decodeXml(match?.[1] || "")
+}
+
+function xmlAttribute(block, tag, attribute) {
+  const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const escapedAttribute = attribute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const tagMatch = block.match(new RegExp(`<${escapedTag}\\b[^>]*>`, "i"))
+  if (!tagMatch) return ""
+  const attributeMatch = tagMatch[0].match(new RegExp(`${escapedAttribute}=["']([^"']+)["']`, "i"))
+  return decodeXml(attributeMatch?.[1] || "")
+}
+
+function stableTrackId(value) {
+  let hash = 2166136261
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+  return -Math.max(1, Math.abs(hash >>> 0))
+}
+
+async function getRssUrl(profileUrl) {
+  if (process.env.SOUNDCLOUD_RSS_URL) return process.env.SOUNDCLOUD_RSS_URL
+
+  const preview = await oEmbed(profileUrl)
+  const encodedResourceUrl = (preview.html || "").match(/[?&]url=([^&"']+)/i)?.[1]
+  const decodedResourceUrl = encodedResourceUrl ? decodeURIComponent(encodedResourceUrl) : ""
+  const userId = decodedResourceUrl.match(/api\.soundcloud\.com\/users\/(\d+)/i)?.[1]
+  if (!userId) throw new Error("SoundCloud RSS kullanıcı kimliği bulunamadı.")
+  return `https://feeds.soundcloud.com/users/soundcloud:users:${userId}/sounds.rss`
+}
+
+async function getProfileTracksFromRss(profileUrl) {
+  const rssUrl = await getRssUrl(profileUrl)
+  let endpoint = new URL(rssUrl)
+  const pages = []
+  const visitedPages = new Set()
+  while (endpoint && !visitedPages.has(endpoint.href) && pages.length < 10) {
+    visitedPages.add(endpoint.href)
+    const response = await fetch(endpoint, { headers: { Accept: "application/rss+xml, application/xml, text/xml" } })
+    if (!response.ok) throw new Error("LOWRadio SoundCloud RSS akışı alınamadı.")
+    const xml = await response.text()
+    pages.push(xml)
+
+    const nextLink = (xml.match(/<atom:link\b(?=[^>]*\brel=["']next["'])[^>]*\bhref=["']([^"']+)["'][^>]*\/?\s*>/i) ||
+      xml.match(/<atom:link\b(?=[^>]*\bhref=["']([^"']+)["'])[^>]*\brel=["']next["'][^>]*\/?\s*>/i))?.[1]
+    if (!nextLink) break
+    const nextEndpoint = new URL(decodeXml(nextLink))
+    if (nextEndpoint.protocol !== "https:" || nextEndpoint.hostname !== "feeds.soundcloud.com") {
+      throw new Error("SoundCloud RSS sayfalama bağlantısı geçersiz.")
+    }
+    endpoint = nextEndpoint
+  }
+
+  const firstPage = pages[0] || ""
+  const channelAuthor = xmlText(firstPage, "itunes:author") || xmlText(firstPage, "title") || "LOWRadio"
+  const channelArtwork = xmlAttribute(firstPage, "itunes:image", "href") || xmlText(firstPage, "url") || null
+  const items = pages.flatMap((xml) => xml.match(/<item\b[\s\S]*?<\/item>/gi) || [])
+  const seen = new Set()
+
+  return items.map((item) => {
+    const url = xmlText(item, "link")
+    const title = xmlText(item, "title")
+    const authorName = xmlText(item, "itunes:author") || xmlText(item, "dc:creator") || channelAuthor
+    const artworkUrl = xmlAttribute(item, "itunes:image", "href") ||
+      xmlAttribute(item, "media:thumbnail", "url") || channelArtwork
+    return { id: stableTrackId(url || title), kind: "track", url, title, authorName, artworkUrl }
+  }).filter((track) => {
+    if (!isSoundCloudUrl(track.url) || !track.title || seen.has(track.url)) return false
+    seen.add(track.url)
+    return true
+  })
+}
 
 function isSoundCloudUrl(value) {
   try {
@@ -14,15 +104,17 @@ function isSoundCloudUrl(value) {
 
 async function oEmbed(url) {
   if (!isSoundCloudUrl(url)) throw Object.assign(new Error("Geçerli bir SoundCloud bağlantısı girin."), { status: 400 })
+  const parsed = new URL(url)
+  const pathParts = parsed.pathname.split("/").filter(Boolean)
+  const isTracksTab = pathParts.length === 2 && pathParts[1].toLowerCase() === "tracks"
+  const resolvedUrl = isTracksTab ? `${parsed.origin}/${pathParts[0]}` : url
   const endpoint = new URL("https://soundcloud.com/oembed")
   endpoint.searchParams.set("format", "json")
-  endpoint.searchParams.set("url", url)
+  endpoint.searchParams.set("url", resolvedUrl)
   const response = await fetch(endpoint, { headers: { Accept: "application/json" } })
   if (!response.ok) throw Object.assign(new Error("SoundCloud bağlantısı doğrulanamadı."), { status: 422 })
   const data = await response.json()
-  const parsed = new URL(url)
-  const pathParts = parsed.pathname.split("/").filter(Boolean)
-  const resourceType = pathParts.includes("sets") ? "playlist" : pathParts.length <= 1 ? "profile" : "track"
+  const resourceType = pathParts.includes("sets") ? "playlist" : pathParts.length <= 1 || isTracksTab ? "profile" : "track"
   return {
     url,
     title: data.title || data.author_name || "SoundCloud",
@@ -53,32 +145,72 @@ async function getSoundCloudToken() {
 
 async function getProfileTracks(profileUrl) {
   if (!isSoundCloudUrl(profileUrl)) return null
+  if (
+    profileTracksCache?.profileUrl === profileUrl &&
+    profileTracksCache.expiresAt > Date.now()
+  ) return profileTracksCache.tracks
+
   const token = await getSoundCloudToken()
-  if (!token) return null
+  if (!token) {
+    const tracks = await getProfileTracksFromRss(profileUrl)
+    profileTracksCache = { profileUrl, tracks, expiresAt: Date.now() + PROFILE_TRACKS_CACHE_MS }
+    return tracks
+  }
   const headers = { Authorization: `OAuth ${token}`, Accept: "application/json" }
+  const parsedProfileUrl = new URL(profileUrl)
+  const profileParts = parsedProfileUrl.pathname.split("/").filter(Boolean)
+  const resolvableProfileUrl = profileParts.length === 2 && profileParts[1].toLowerCase() === "tracks"
+    ? `${parsedProfileUrl.origin}/${profileParts[0]}`
+    : profileUrl
   const resolveEndpoint = new URL("https://api.soundcloud.com/resolve")
-  resolveEndpoint.searchParams.set("url", profileUrl)
+  resolveEndpoint.searchParams.set("url", resolvableProfileUrl)
   const resolvedResponse = await fetch(resolveEndpoint, { headers })
   if (!resolvedResponse.ok) throw new Error("LOWRadio SoundCloud profili çözümlenemedi.")
   const profile = await resolvedResponse.json()
   const profileId = profile.urn || profile.id
   if (!profileId) throw new Error("LOWRadio SoundCloud profil kimliği bulunamadı.")
 
-  const endpoint = new URL(`https://api.soundcloud.com/users/${encodeURIComponent(profileId)}/tracks`)
+  let endpoint = new URL(`https://api.soundcloud.com/users/${encodeURIComponent(profileId)}/tracks`)
   endpoint.searchParams.set("limit", "200")
   endpoint.searchParams.set("linked_partitioning", "true")
-  const tracksResponse = await fetch(endpoint, { headers })
-  if (!tracksResponse.ok) throw new Error("LOWRadio SoundCloud parçaları alınamadı.")
-  const payload = await tracksResponse.json()
-  const tracks = Array.isArray(payload) ? payload : payload.collection || []
-  return tracks.map((track) => ({
+
+  const allTracks = []
+  const visitedPages = new Set()
+  while (endpoint && !visitedPages.has(endpoint.href)) {
+    visitedPages.add(endpoint.href)
+    const tracksResponse = await fetch(endpoint, { headers })
+    if (!tracksResponse.ok) throw new Error("LOWRadio SoundCloud parçaları alınamadı.")
+    const payload = await tracksResponse.json()
+    allTracks.push(...(Array.isArray(payload) ? payload : payload.collection || []))
+
+    if (Array.isArray(payload) || !payload.next_href) break
+    const nextEndpoint = new URL(payload.next_href)
+    if (nextEndpoint.protocol !== "https:" || nextEndpoint.hostname !== "api.soundcloud.com") {
+      throw new Error("SoundCloud sayfalama bağlantısı geçersiz.")
+    }
+    endpoint = nextEndpoint
+  }
+
+  const seen = new Set()
+  const tracks = allTracks.map((track) => ({
     id: -Math.abs(Number(track.id) || 0),
     kind: "track",
     url: track.permalink_url,
     title: track.title,
     authorName: track.user?.username || profile.username || "LOWRadio",
     artworkUrl: track.artwork_url || track.user?.avatar_url || profile.avatar_url || null,
-  })).filter((track) => track.id && track.url && track.title)
+  })).filter((track) => {
+    if (!track.id || !track.url || !track.title || seen.has(track.id)) return false
+    seen.add(track.id)
+    return true
+  })
+
+  profileTracksCache = {
+    profileUrl,
+    tracks,
+    expiresAt: Date.now() + PROFILE_TRACKS_CACHE_MS,
+  }
+  return tracks
 }
 
 router.get("/soundcloud/catalog", async (_req, res) => {
@@ -86,7 +218,7 @@ router.get("/soundcloud/catalog", async (_req, res) => {
   try {
     db = await getCustomDbConnection("lforadio")
     const [settings, lowradio, artists] = await Promise.all([
-      db.query("SELECT lowradio_profile_url, lowradio_profile_name, lowradio_artwork_url FROM soundcloud_settings WHERE id=1"),
+      db.query("SELECT lowradio_profile_url, lowradio_tracks_url, lowradio_profile_name, lowradio_artwork_url FROM soundcloud_settings WHERE id=1"),
       db.query(`SELECT id, kind, soundcloud_url AS url, title,
         author_name AS "authorName", artwork_url AS "artworkUrl"
         FROM soundcloud_items WHERE scope='lowradio' AND active=true ORDER BY sort_order,id`),
@@ -97,7 +229,7 @@ router.get("/soundcloud/catalog", async (_req, res) => {
     ])
     const profile = settings.rows[0] || null
     let profileTracks = null
-    try { profileTracks = await getProfileTracks(profile?.lowradio_profile_url) }
+    try { profileTracks = await getProfileTracks(profile?.lowradio_tracks_url || profile?.lowradio_profile_url) }
     catch (error) { console.warn("SoundCloud profil parçaları alınamadı; kayıtlı katalog kullanılıyor:", error.message) }
     res.json({ profile, lowradio: profileTracks || lowradio.rows, artists: artists.rows })
   } catch (error) { res.status(500).json({ message: "SoundCloud kataloğu alınamadı.", error: error.message }) }
@@ -160,12 +292,13 @@ router.get("/soundcloud/admin/data", async (_req, res) => {
 })
 
 router.put("/soundcloud/admin/settings", async (req, res) => {
-  const { profileUrl, profileName, artworkUrl } = req.body || {}
+  const { profileUrl, tracksUrl, profileName, artworkUrl } = req.body || {}
   let db
   try {
     db = await getCustomDbConnection("lforadio")
-    const result = await db.query(`INSERT INTO soundcloud_settings(id,lowradio_profile_url,lowradio_profile_name,lowradio_artwork_url,updated_at)
-      VALUES(1,$1,$2,$3,now()) ON CONFLICT(id) DO UPDATE SET lowradio_profile_url=$1,lowradio_profile_name=$2,lowradio_artwork_url=$3,updated_at=now() RETURNING *`, [profileUrl || null, profileName || null, artworkUrl || null])
+    const result = await db.query(`INSERT INTO soundcloud_settings(id,lowradio_profile_url,lowradio_tracks_url,lowradio_profile_name,lowradio_artwork_url,updated_at)
+      VALUES(1,$1,$2,$3,$4,now()) ON CONFLICT(id) DO UPDATE SET lowradio_profile_url=$1,lowradio_tracks_url=$2,lowradio_profile_name=$3,lowradio_artwork_url=$4,updated_at=now() RETURNING *`, [profileUrl || null, tracksUrl || profileUrl || null, profileName || null, artworkUrl || null])
+    profileTracksCache = null
     res.json(result.rows[0])
   } catch (error) { res.status(500).json({ message: error.message }) }
   finally { if (db) await db.end().catch(() => {}) }

@@ -261,7 +261,7 @@ export function SoundCloudProvider({ children, pathname }: { children: ReactNode
   }, [])
 
   useEffect(() => {
-    if (pathname !== "/calma-listeleri" && !persistent) {
+    if (pathname !== "/dj-sets" && !persistent) {
       try { widgetRef.current?.pause() } catch { /* iframe kapanmış olabilir */ }
       setIsPlaying(false)
       setSurface(null)

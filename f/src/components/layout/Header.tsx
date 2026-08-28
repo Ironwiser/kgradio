@@ -6,7 +6,7 @@ import { useAuth } from "@/context/auth-context"
 
 const navLinks = [
   { to: "/canli", label: "Canlı Yayın" },
-  { to: "/calma-listeleri", label: "Çalma Listeleri" },
+  { to: "/dj-sets", label: "DJ Sets" },
   { to: "/hakkimizda", label: "Hakkımızda" },
 ]
 

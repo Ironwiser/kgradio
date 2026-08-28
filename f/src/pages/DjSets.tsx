@@ -3,9 +3,9 @@ import { ExternalLink, Play } from "lucide-react"
 import { SoundCloudSurface, useSoundCloud, type SoundCloudItem } from "@/context/soundcloud-context"
 
 type Artist = { id:number; profile_url:string; name:string; artwork_url?:string|null; description?:string|null; items:SoundCloudItem[] }
-type Catalog = { profile:{ lowradio_profile_url?:string; lowradio_profile_name?:string; lowradio_artwork_url?:string }|null; lowradio:SoundCloudItem[]; artists:Artist[] }
+type Catalog = { profile:{ lowradio_profile_url?:string; lowradio_tracks_url?:string; lowradio_profile_name?:string; lowradio_artwork_url?:string }|null; lowradio:SoundCloudItem[]; artists:Artist[] }
 
-export function Listeler() {
+export function DjSets() {
   const [catalog, setCatalog] = useState<Catalog|null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -15,15 +15,15 @@ export function Listeler() {
 
   return <section className="editorial-page soundcloud-editorial-page"><div className="soundcloud-editorial-shell">
     <header className="soundcloud-editorial-top">
-      <div className="editorial-page-index"><span /> SELECTED / 02</div>
-      <div><h1>Çalma Listeleri</h1></div>
+      <div className="editorial-page-index"><span /> DJ SETS / 02</div>
+      <div><h1>DJ Sets</h1></div>
       <span>{String(total).padStart(2,"0")} KAYIT</span>
     </header>
 
     <main className="soundcloud-editorial-main">
       {loading?<p className="soundcloud-editorial-state">Yükleniyor…</p>:error?<p className="soundcloud-editorial-state soundcloud-error">{error}</p>:<div className="soundcloud-editorial-columns">
         <section className="soundcloud-editorial-list soundcloud-editorial-own">
-          <header><h2>LOWRadio</h2>{catalog?.profile?.lowradio_profile_url&&<a href={catalog.profile.lowradio_profile_url} target="_blank" rel="noreferrer">SOUNDCLOUD <ExternalLink/></a>}</header>
+          <header><h2>LOWRadio</h2>{(catalog?.profile?.lowradio_tracks_url||catalog?.profile?.lowradio_profile_url)&&<a href={catalog.profile.lowradio_tracks_url||catalog.profile.lowradio_profile_url} target="_blank" rel="noreferrer">SOUNDCLOUD <ExternalLink/></a>}</header>
           {!catalog?.lowradio.length?<p className="soundcloud-list-empty">Henüz kayıt eklenmedi.</p>:<ol>{catalog.lowradio.map((item,index)=><li key={item.id} className={player.current?.id===item.id?"soundcloud-track-active":""}><button type="button" onClick={()=>player.play(item)}><span>{String(index+1).padStart(2,"0")}</span>{item.artworkUrl?<img src={item.artworkUrl} alt=""/>:<i className="soundcloud-row-art">LR</i>}<div><strong>{item.title}</strong><small>{item.authorName||"LOWRadio"}</small></div><Play/></button>{player.current?.id===item.id&&<SoundCloudSurface className="soundcloud-inline-player"/>}</li>)}</ol>}
         </section>
 

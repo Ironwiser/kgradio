@@ -58,7 +58,6 @@ export function Giris() {
         <header className="editorial-page-header">
           <div className="editorial-page-index"><span /> ACCOUNT / 04</div>
           <h1>Tekrar<br />Hoş Geldin</h1>
-          <p>Hesabına bağlan ve LOWRadio arşivine kaldığın yerden devam et.</p>
         </header>
 
         <div className="editorial-page-content editorial-form-panel">

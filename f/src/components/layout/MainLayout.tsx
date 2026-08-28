@@ -10,6 +10,7 @@ import { SoundCloudProvider } from "@/context/soundcloud-context"
 const routeOrder: Record<string, number> = {
   "/": 0,
   "/canli": 1,
+  "/dj-sets": 2,
   "/calma-listeleri": 2,
   "/hakkimizda": 3,
   "/rasgele": 3,
